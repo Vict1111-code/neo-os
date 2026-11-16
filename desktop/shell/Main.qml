@@ -150,6 +150,12 @@ ApplicationWindow {
         asynchronous: true
         cache: false
     }
+    // User-adjustable contrast overlay: wallpapers stay legible beneath text and cards.
+    Rectangle {
+        anchors.fill: parent
+        color: "#03091c"
+        opacity: backend.wallpaperDim
+    }
     Rectangle {
         anchors.fill: parent
         gradient: Gradient {
@@ -333,6 +339,16 @@ ApplicationWindow {
         }
         Rectangle {
             anchors.centerIn: parent
+            width: orbit.orbitRadius * 2 + 55
+            height: width
+            radius: width / 2
+            color: "transparent"
+            border.width: 10
+            border.color: root.neon
+            opacity: 0.12
+        }
+        Rectangle {
+            anchors.centerIn: parent
             width: orbit.orbitRadius * 2 + 22
             height: width
             radius: width / 2
@@ -353,8 +369,8 @@ ApplicationWindow {
         Rectangle {
             id: dockCenter
             anchors.centerIn: parent
-            width: 92
-            height: 92
+            width: Math.max(92, orbit.width * 0.27)
+            height: width
             radius: width / 2
             gradient: Gradient {
                 GradientStop { position: 0; color: "#345eb3" }
@@ -556,7 +572,17 @@ ApplicationWindow {
         radius: 30
         color: "#e0081730"
         border.width: 2
-        border.color: root.neonSoft
+        border.color: root.neon
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: -4
+            radius: parent.radius + 4
+            color: "transparent"
+            border.width: 4
+            border.color: root.neonSoft
+            opacity: 0.16
+            z: -1
+        }
         Row {
             anchors.centerIn: parent
             spacing: 15
@@ -688,8 +714,8 @@ ApplicationWindow {
         id: appearancePanel
         visible: root.showSettings
         z: 31
-        width: 460
-        height: 343
+        width: Math.min(520, root.width - 50)
+        height: Math.min(520, root.height - 80)
         anchors.centerIn: parent
         radius: 18
         color: "#f20a1730"
@@ -734,6 +760,78 @@ ApplicationWindow {
                 checked: root.reducedMotion
                 onToggled: root.reducedMotion = checked
                 Accessible.name: "Reduce interface animations"
+            }
+            Text { text: "Wallpaper gallery — installed locally"; color: "#ecfaff"; font.bold: true }
+            Flickable {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 110
+                contentWidth: galleryRow.width
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                Row {
+                    id: galleryRow
+                    spacing: 10
+                    Repeater {
+                        model: backend.wallpaperThemes
+                        delegate: Button {
+                            required property var modelData
+                            width: 132
+                            height: 104
+                            Accessible.name: "Select wallpaper " + modelData.name
+                            onClicked: {
+                                root.notice = backend.setWallpaperPath(modelData.url)
+                                    ? "Wallpaper selected: " + modelData.name
+                                    : "Wallpaper unavailable"
+                            }
+                            background: Rectangle {
+                                radius: 12
+                                color: "#251b3d"
+                                border.width: backend.wallpaperUrl === modelData.url ? 3 : 1
+                                border.color: backend.wallpaperUrl === modelData.url ? root.neon : "#516aa0"
+                                Image {
+                                    anchors.fill: parent
+                                    anchors.margins: 4
+                                    source: modelData.url
+                                    fillMode: Image.PreserveAspectCrop
+                                    asynchronous: true
+                                }
+                                Rectangle {
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.bottom: parent.bottom
+                                    anchors.margins: 4
+                                    height: 27
+                                    radius: 5
+                                    color: "#df071327"
+                                    Text {
+                                        anchors.fill: parent
+                                        anchors.margins: 4
+                                        text: modelData.name
+                                        color: "#fff"
+                                        elide: Text.ElideRight
+                                        font.pixelSize: 10
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Text { text: "Wallpaper contrast"; color: "#ecfaff" }
+                Slider {
+                    id: dimSlider
+                    Layout.fillWidth: true
+                    from: 0
+                    to: 0.72
+                    stepSize: 0.02
+                    value: backend.wallpaperDim
+                    Accessible.name: "Wallpaper dim overlay"
+                    onMoved: backend.setWallpaperDim(value)
+                }
+                Text { text: Math.round(backend.wallpaperDim * 100) + "%"; color: "#c8eaff" }
             }
             Text { text: "Accent theme"; color: "#ecfaff"; font.bold: true }
             RowLayout {
