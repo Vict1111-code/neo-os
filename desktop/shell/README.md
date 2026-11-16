@@ -28,6 +28,14 @@ cmake --build out/neo-desktop
 
 If `git pull --ff-only` refuses because of local modifications, preserve those modifications rather than resetting or overwriting. If the GUI fails, run `./out/neo-desktop/neo-desktop 2>&1 | tee neo-desktop-runtime.log` and share the terminal output.
 
+## Keyboard controls (Issue #3)
+- **Ctrl+Space** toggles the orbital dock within the preview window.
+- **Ctrl+K** opens/closes the installed-app panel and focuses its search field.
+- **Escape** dismisses the application panel or collapses the dock.
+- The dock center is a focusable button. When keyboard-focused, its border changes to gold; **Enter/Space** should activate it.
+
+**Important:** These controls are a new *unverified* source change and need Ubuntu runtime testing before acceptance.
+
 ## New in this iteration
 - Real system application icons through Qt `QIcon` and `image://appicons` (fall back to initials where no icon exists).
 - Cleaner default desktop composition with subtle celestial rings and less visual clutter.

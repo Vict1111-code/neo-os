@@ -17,3 +17,13 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - Dock, pin persistence, installed application enumeration, and terminal launch are implemented **in source only**. No compilation, runtime UI behavior, or application launch has yet been verified.
 - Static source checks were inspected; GitHub CI workflow exists but passing execution is unverified.
 - Next: verify Qt CMake compilation and QML startup; confirm real app launch, pin persistence, reduced motion, and terminal behavior on supported Linux. Fix errors before claiming a working demo.
+
+## Issue #3 — Keyboard-first dock validation (in review)
+- Source branch `feat/3-keyboard-orbital-dock` proposes window-scoped shortcuts Ctrl+Space (dock), Ctrl+K (app search), Escape (dismiss), and keyboard-focus styling.
+- Relevant Qt Quick QML feature: `Shortcut` with window context; `Button` with strong focus policy.
+- C++ launcher/pins unchanged. Ubuntu compilation and runtime keyboard behavior still need validation; do not claim completion until issue criteria are verified.
+
+## Issue #3 validation update (2026-11-16)
+- User reports 6/6 manual Ubuntu checks passed: Ctrl+Space, Ctrl+K, Escape, dock-center keyboard activation, real app launching, and pin persistence.
+- GitHub Actions PR #4 run #14 built successfully and passed static source tests; broader automated GUI interaction and independent review were not performed.
+- Remaining engineering work: real window management integration, fuller keyboard/a11y checks, reliable app-state tracking, and LFS integration.

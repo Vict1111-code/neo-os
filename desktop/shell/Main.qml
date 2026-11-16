@@ -17,6 +17,30 @@ ApplicationWindow {
     property bool dockExpanded: false
     property string notice: "Desktop prototype ready • Select an application"
     property string searchText: ""
+    // Keyboard shortcuts are active within the preview window.
+    function toggleApps() {
+        showAppList = !showAppList
+        if (showAppList) searchField.forceActiveFocus()
+    }
+    Shortcut {
+        sequence: "Ctrl+Space"
+        context: Qt.WindowShortcut
+        onActivated: root.dockExpanded = !root.dockExpanded
+    }
+    Shortcut {
+        sequence: "Ctrl+K"
+        context: Qt.WindowShortcut
+        onActivated: root.toggleApps()
+    }
+    Shortcut {
+        sequence: "Escape"
+        context: Qt.WindowShortcut
+        enabled: root.showAppList || root.dockExpanded
+        onActivated: {
+            if (root.showAppList) root.showAppList = false
+            else root.dockExpanded = false
+        }
+    }
 
     function openMatrix() {
         notice = backend.launchMatrix()
@@ -134,8 +158,7 @@ ApplicationWindow {
                             Accessible.name: modelData.label
                             onClicked: {
                                 if (index === 1) {
-                                    root.showAppList = !root.showAppList
-                                    if (root.showAppList) searchField.forceActiveFocus()
+                                    root.toggleApps()
                                 } else if (index === 2) root.openMatrix()
                                 else if (index === 3) root.reducedMotion = !root.reducedMotion
                                 else root.notice = "NEO Workspace • Home"
@@ -345,8 +368,8 @@ ApplicationWindow {
                 GradientStop { position: 0; color: "#385b9a" }
                 GradientStop { position: 1; color: "#19294b" }
             }
-            border.color: "#c499f7"
-            border.width: 3
+            border.color: dockButton.activeFocus ? "#f6d58b" : "#c499f7"
+            border.width: dockButton.activeFocus ? 4 : 3
             Text {
                 anchors.centerIn: parent
                 text: "◈"
@@ -354,8 +377,10 @@ ApplicationWindow {
                 font.pixelSize: 42
             }
             Button {
+                id: dockButton
                 anchors.fill: parent
                 opacity: 0
+                focusPolicy: Qt.StrongFocus
                 Accessible.name: root.dockExpanded ? "Collapse orbital dock" : "Expand orbital dock"
                 onClicked: root.dockExpanded = !root.dockExpanded
             }
@@ -427,7 +452,7 @@ ApplicationWindow {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
-            text: "ORBITAL DOCK  ·  right-click icon to unpin"
+            text: "Ctrl+Space: dock  ·  Ctrl+K: search  ·  Esc: close"
             color: "#bddbeb"
             font.pixelSize: 11
         }
