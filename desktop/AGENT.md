@@ -37,3 +37,10 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - `MatrixPty::stop()` now attempts to signal the foreground PTY process group and Bash process group before reap/force-kill of the direct child.
 - `MatrixPtySmoke.cpp` adds a live headless integration test and CTest/CI integration. It does not establish cleanup of arbitrary detached descendants.
 - Do not call this a production-quality terminal emulator. Review/test errors and manual Ubuntu behavior before merging.
+
+## Issue #9 — Reference-driven celestial refinement
+- Branch `feat/9-celestial-desktop-refinement` is **stacked on** `feat/5-matrix-pty-prototype` / PR #6. Its PR must target the same base until Matrix #6 merges; then rebase/retarget and rerun CI. Do not accidentally discard `MatrixPty`.
+- User-supplied UI references show starry planetary/fantasy celestial scenes, dark translucent glass panels, cyan/violet/pink highlights, top workspace switcher, left navigation, orbit-style launcher and status/AI/store/device cards.
+- Implement real local app controls; label unsupported AI, telemetry, universal app store, device sync and workspace isolation as preview. No fake live statistics.
+- Wallpaper setting accepts a verified readable **local** image path and stores a file URL; fallback is generated Canvas scenery, not a claim that the uploaded screenshot has been embedded as a clean wallpaper.
+- Verify 1360×820 and 1024×640, QML errors, app launching, pins, wallpaper persistence, keyboard focus, Matrix CLI and reduced motion before merge.
