@@ -113,3 +113,10 @@ These results are self-reported manual tests, not independent automated PTY life
 - At the latest inspection, zero GitHub PR reviews were submitted.
 - **Open process lifecycle risk:** `MatrixPty::stop()` sends SIGHUP/SIGKILL to the immediate Bash PID and reaps it, but does not explicitly enumerate or terminate all foreground process groups/descendants. The user test of Stop/Start is not sufficient evidence of no orphaned foreground processes.
 - **Open PR #6 and Issue #5 until cleanup behavior is validated and review requirements are resolved.** Do not claim production-quality terminal emulation.
+
+### Targeted background-process cleanup test — 2026-11-16 19:55
+- User ran `sleep 90 & echo $!` in Matrix CLI, stopped the shell and checked the resulting PID **77343** from the Ubuntu host.
+- Observed `ps -p 77343 -o pid,stat,cmd` output: only the header `PID STAT CMD`, with no matching process row.
+- **Result: PASS for this particular background process** — it was not present at inspection time. This is user-reported observational evidence, not a comprehensive verification of child process groups or all workloads.
+- GitHub Actions run #43942913609 succeeded on branch commit `dbc27a0`. No independent reviewer approval has been recorded.
+- Keep the incomplete descendant/process-group cleanup guarantee as an explicit limitation; require further review before claiming comprehensive lifecycle safety or stable terminal-emulator readiness.
