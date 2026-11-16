@@ -127,3 +127,10 @@ These results are self-reported manual tests, not independent automated PTY life
 - The integration test requires a standalone output line to avoid mistaking shell command echo for successful execution.
 - **Status:** New code and tests committed on PR #6 feature branch; new CI run and post-change Ubuntu runtime regression results are pending. Previously reported manual tests apply to the earlier implementation.
 - **Residual risk:** detached/disowned jobs may outlive the terminal; no general descendant supervisor has been implemented. Independent review remains outstanding.
+
+### Post-hardening Ubuntu regression result — 2026-11-16 20:25
+- User reports the updated desktop and Matrix CLI are "working fine" following the latest process-group cleanup changes.
+- This is **general user-reported success**, not an itemized retest transcript for each behavior; the earlier 4/4 interaction results apply to the pre-hardening version.
+- GitHub Actions run #43945489673 completed successfully for commit `ae7314b`, including live PTY integration smoke test, source tests, Qt build and artifact upload.
+- A targeted earlier background PID test passed. Detached descendant cleanup and full terminal emulation remain limitations.
+- **Independent PR review not yet recorded**. Keep PR #6 open pending required review; do not misrepresent generic "working fine" as full formal approval.
