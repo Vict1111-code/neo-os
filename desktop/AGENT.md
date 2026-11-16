@@ -44,3 +44,9 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - Implement real local app controls; label unsupported AI, telemetry, universal app store, device sync and workspace isolation as preview. No fake live statistics.
 - Wallpaper setting accepts a verified readable **local** image path and stores a file URL; fallback is generated Canvas scenery, not a claim that the uploaded screenshot has been embedded as a clean wallpaper.
 - Verify 1360×820 and 1024×640, QML errors, app launching, pins, wallpaper persistence, keyboard focus, Matrix CLI and reduced motion before merge.
+
+## Issue #9 — Celestial wallpaper/gallery refinement
+- `desktop/shell/install-wallpapers.sh` copies local PNG/JPG/WebP assets from a user-supplied extracted wallpaper pack into the user's XDG data directory without sudo. **The generated image binaries are not yet committed in GitHub.**
+- `DesktopBackend` discovers readable image assets in `neo-os/wallpapers`, defaults to sorted `01-ringed-moon-citadel.webp` if installed and no saved choice, and persists selected wallpaper and dim level.
+- `Main.qml` now provides a scrollable thumbnail gallery, wallpaper contrast slider, luminous orbit-ring halo and compact dock styling.
+- Verify actual renders and settings persistence on Ubuntu. CI compile and source checks do not guarantee pixel-level reference fidelity.
