@@ -58,3 +58,8 @@ Every next milestone must record actual tests, warnings, changed paths, branch/c
 2. Verify real icons, opening installed applications, pin/unpin persistence, searchable app list and dock expansion.
 3. Collect compiler/QML errors or screenshot and fix if necessary.
 4. Add genuine keyboard focus handling and proper terminal session integration after successful runtime validation.
+
+## Engineering workflow governance (Issue #1)
+- Proposed process: tracked GitHub issues, isolated branches, PRs, review/checks, merge and issue closure for every change; explain and teach every implementation.
+- See `docs/agent/WORKFLOW.md` for the exact lifecycle and required learning handoff.
+- This policy is documentation/governance only; it does not establish GUI 0.2 runtime verification or LFS boot success.
