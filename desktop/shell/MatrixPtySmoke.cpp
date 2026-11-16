@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     });
 
     QObject::connect(&terminal, &MatrixPty::outputChanged, &app, [&]() {
-        if (!sent || !terminal.output().contains("NEO_PTY_INTEGRATION_OK")) return;
+        if (!sent || !terminal.output().contains("\nNEO_PTY_INTEGRATION_OK\n")) return;
         terminal.stop();
         if (terminal.running()) {
             qCritical() << "PTY session still marked running after stop";
