@@ -42,6 +42,25 @@ class DesktopSourceTests(unittest.TestCase):
         self.assertIn("matrixPty.stop()", qml)
         self.assertIn("MatrixTerminal {", root_qml)
 
+    def test_celestial_visual_contract_and_no_fake_data(self):
+        qml = (SHELL / "Main.qml").read_text()
+        cpp = (SHELL / "main.cpp").read_text()
+        for token in (
+            "Canvas {", "createRadialGradient", "source: backend.wallpaperUrl",
+            "backend.setWallpaperPath(", "backend.setAccentTheme(",
+            "backend.pinnedApps", "backend.availableApps",
+            "NEO AI ASSISTANT", "SYSTEM STATUS", "NEO MARKET",
+            "DEVICES & SYNC", "Ctrl+Space", "Ctrl+K",
+            "not connected", "not implemented", "root.reducedMotion"
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, qml)
+        for token in ("QImageReader(path).canRead()", "appearance/wallpaper",
+                      "appearance/accent", "wallpaperUrlChanged()",
+                      "accentThemeChanged()"):
+            with self.subTest(token=token):
+                self.assertIn(token, cpp)
+
     def test_launcher_avoids_shell_interpolation(self):
         cpp = (SHELL / "main.cpp").read_text()
         self.assertIn('QProcess::startDetached("gio", {"launch", appPaths.value(id)})', cpp)
