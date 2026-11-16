@@ -127,20 +127,35 @@ void MatrixPty::checkChild() {
 void MatrixPty::stop() {
     pollTimer_.stop();
     if (notifier_) { delete notifier_; notifier_ = nullptr; }
+    // The foreground job can be in a different process group from Bash.
+    // Signal that group before closing the PTY, while we can still query it.
+    if (childPid_ > 0 && masterFd_ >= 0) {
+        const pid_t foreground = tcgetpgrp(masterFd_);
+        if (foreground > 0 && foreground != getpgrp() &&
+            foreground != static_cast<pid_t>(childPid_)) {
+            (void)kill(-foreground, SIGHUP);
+        }
+    }
     if (masterFd_ >= 0) { close(masterFd_); masterFd_ = -1; }
     if (childPid_ > 0) {
         const pid_t pid = static_cast<pid_t>(childPid_);
-        // Shell is a session leader. Hang up its session; reap with bounded wait.
-        kill(pid, SIGHUP);
+        // Signal Bash's process group, not just its PID. Other detached or
+        // disowned job groups may still survive: this is not a sandbox.
+        (void)kill(-pid, SIGHUP);
         bool reaped = false;
         int status = 0;
         for (int i = 0; i < 10; ++i) {
-            if (waitpid(pid, &status, WNOHANG) == pid) { reaped = true; break; }
+            const pid_t result = waitpid(pid, &status, WNOHANG);
+            if (result == pid || (result == -1 && errno == ECHILD)) {
+                reaped = true;
+                break;
+            }
+            if (result == -1 && errno != EINTR) break;
             usleep(10000);
         }
         if (!reaped) {
-            kill(pid, SIGKILL);
-            (void)waitpid(pid, &status, 0);
+            (void)kill(-pid, SIGKILL);
+            while (waitpid(pid, &status, 0) == -1 && errno == EINTR) {}
         }
         childPid_ = -1;
         emit runningChanged();
