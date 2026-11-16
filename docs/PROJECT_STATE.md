@@ -3,37 +3,44 @@
 Updated: 2026-11-16
 
 ## Verified GitHub documentation
-- PRD candidate export: `docs/PRD.md`.
-- Roadmap candidate export: `docs/ROADMAP.md`.
-- Root and eight subsystem AGENT.md instructions plus agent templates.
-- Draft system architecture: `docs/ARCHITECTURE.md`.
-- Draft service APIs: `docs/API_CONTRACTS.md`.
-- Draft distribution engineering: `docs/BUILD_AND_UPDATES.md`.
-- Draft threat model: `docs/SECURITY.md`.
-- Draft desktop design system: `docs/DESIGN_SYSTEM.md`.
-- Ten proposed ADRs at `docs/ADR/ADR-001.md` through `ADR-010.md`; none accepted.
+- PRD and roadmap candidate exports: `docs/PRD.md`, `docs/ROADMAP.md`.
+- System architecture, service contracts, build/update strategy, security and GUI design system drafts.
+- Ten proposed ADRs and agent instructions.
 
-## Current phase
-Phase 0 — architecture and technical foundation. Architecture documentation has been committed, but formal decisions, environment testing, and implementation remain outstanding.
+## Current implementation milestone
+**Phase 1 / Track A — Native Desktop Proof of Concept initiated.**
 
-## Not verified / not completed
-- No bootable NEO-OS build, LFS/QEMU console boot, physical hardware testing or CI execution.
-- No Qt/QML GUI implementation or orbital dock running in the OS.
-- No installer, package manager, AI daemon, app store or tested network security subsystem.
-- No signed software release.
-- No tested host hardware inventory, disk/virtualization audit or independent approval of PRD DOCX/Markdown parity.
-- Original binary PDF/DOCX/ZIP package and visual references have not been committed to GitHub.
+### Committed source (not runtime verified)
+- `desktop/shell/CMakeLists.txt` — Qt 6 Quick/QML build target.
+- `desktop/shell/main.cpp` — installed .desktop entry enumeration; Gio-backed app launch; QSettings pin persistence; terminal launch.
+- `desktop/shell/Main.qml` — native desktop preview with classical-neon visual treatment, left rail, app list, motion toggle and expandable orbital dock.
+- `desktop/shell/README.md` — Linux setup, build/run and manual acceptance tests.
+- `tests/test_desktop_source.py` — basic source-contract checks.
+- `.github/workflows/desktop-preview.yml` — proposed GitHub Actions compile/test workflow.
 
-## Next tasks (priority ordered)
-1. Verify PRD and roadmap text-export fidelity against the original DOCX documents; decide master versions.
-2. Review and approve or revise proposed ADR-001 to ADR-010, especially package selection and update/recovery design.
-3. Inventory development host OS, RAM, CPU, disk and virtualization; prepare isolated build environment.
-4. Implement minimal Qt/QML dock POC (real app launch, persistence, keyboard access, reduced-motion).
-5. Build isolated LFS base to QEMU console boot and capture verified logs.
-6. Add automated Markdown/ADR validity checks and build/desktop smoke tests when code exists.
+### Evidence
+- GitHub contents verified for all six files.
+- Simple read-only source/string inspection checks passed (presence of Qt module, QML path, dock data, pin persistence and Gio launcher).
+- **CMake/Qt compile: NOT RUN**. The assistant environment does not have Qt 6 development packages installed.
+- **GitHub Actions result: NOT VERIFIED**. Workflow was committed but no passing run is established.
+- **Interactive UI, real application launch and Matrix terminal: NOT TESTED**.
+- No source was installed as the host shell or as NEO-OS.
 
-## Last documentation milestone
-Added architecture, API, build/update, security and design-system drafts, along with 10 proposed ADRs. These are documents only; no code execution was performed.
+## Not yet verified
+- Bootable NEO-OS LFS/QEMU console or GUI.
+- Runtime Qt/QML functionality and launch reliability.
+- Package manager, updater, installer, AI daemon, app store, or system integration.
+- Host hardware/virtualization inventory and ADR approvals.
 
-## Handoff instructions
-For every implementation: record files changed, exact commands, test results and failures, risks, blockers and the next actionable task. No invented progress.
+## Next work
+1. Obtain CI compile result and fix any CMake/C++/QML errors.
+2. Run the desktop preview on a supported Linux host; record screenshots, app launch, pin persistence and terminal behavior.
+3. Replace placeholder icons with theme-aware app icons; add keyboard access, focus handling, and real active-window indicators where permitted.
+4. Validate host hardware and begin isolated LFS build.
+5. Review/approve architecture decision records and source docs.
+
+## Safety
+Prototype runs as a normal application window. It must never silently replace host desktop services or modify bootloaders or physical partitions.
+
+## Handoff requirements
+Every next milestone must record actual tests, warnings, changed paths, branch/commits and remaining tasks; never claim a UI works solely from source code.
