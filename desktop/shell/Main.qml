@@ -5,140 +5,275 @@ import QtQuick.Layouts
 ApplicationWindow {
     id: root
     visible: true
-    width: 1180
-    height: 740
-    minimumWidth: 800
-    minimumHeight: 560
+    width: 1280
+    height: 780
+    minimumWidth: 860
+    minimumHeight: 590
     title: "NEO-OS • Desktop Preview"
     color: "#081422"
-    property bool reducedMotion: false
-    property string notice: "Select an application from the orbital dock"
-    property bool showAppList: false
 
+    property bool reducedMotion: false
+    property bool showAppList: false
+    property bool dockExpanded: false
+    property string notice: "Desktop prototype ready • Select an application"
+    property string searchText: ""
+
+    function openMatrix() {
+        notice = backend.launchMatrix()
+            ? "Matrix terminal launch requested"
+            : "No supported terminal installed (xterm, kitty, konsole...)"
+    }
+    function openApp(appId, appName) {
+        notice = backend.launch(appId)
+            ? "Launch requested: " + appName
+            : "Unable to start " + appName
+    }
+
+    // High-contrast, restrained classical-futuristic palette.
     Rectangle {
         anchors.fill: parent
         gradient: Gradient {
-            GradientStop { position: 0.0; color: "#091929" }
-            GradientStop { position: 0.55; color: "#10243c" }
-            GradientStop { position: 1.0; color: "#201737" }
+            GradientStop { position: 0.0; color: "#081525" }
+            GradientStop { position: 0.55; color: "#10243a" }
+            GradientStop { position: 1.0; color: "#1c1a33" }
         }
     }
-    // Atmospheric backdrop: native shapes, no screenshot masquerading as a functional UI.
+    // Atmospheric arc: intentionally subtle so the main work area remains usable.
     Rectangle {
-        width: 500; height: 500; radius: 250
-        anchors.centerIn: parent
-        color: "transparent"; border.color: "#183c61"; border.width: 2
-        opacity: 0.75
+        width: Math.min(root.width * 0.46, 550)
+        height: width
+        radius: width / 2
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        color: "transparent"
+        border.color: "#24415d"
+        border.width: 1
+        opacity: 0.42
     }
     Rectangle {
-        width: 280; height: 280; radius: 140
-        anchors.centerIn: parent
-        gradient: Gradient {
-            GradientStop { position: 0; color: "#224578" }
-            GradientStop { position: 1; color: "#111b37" }
-        }
-        border.color: "#538cce"
-        opacity: 0.8
+        width: Math.min(root.width * 0.25, 300)
+        height: width
+        radius: width / 2
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        color: "#111e33"
+        border.color: "#345a78"
+        opacity: 0.24
     }
 
     Rectangle {
         id: header
-        height: 55; anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-        color: "#d90b1829"
-        border.color: "#2a5174"
+        height: 58
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        color: "#ec0a182a"
+        border.color: "#244967"
+        z: 5
         RowLayout {
-            anchors.fill: parent; anchors.margins: 16; spacing: 16
-            Text { text: "◈  NEO-OS"; color: "#67e8f9"; font.pixelSize: 22; font.bold: true }
-            Text { text: "v0.1 • Desktop POC"; color: "#9fb5cd"; font.pixelSize: 12 }
+            anchors.fill: parent
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
+            spacing: 13
+            Text {
+                text: "◈  NEO-OS"
+                color: "#7be5f5"
+                font.pixelSize: 22
+                font.bold: true
+            }
+            Text { text: "v0.2 preview"; color: "#aabfd4"; font.pixelSize: 12 }
             Item { Layout.fillWidth: true }
-            Text { text: "Workspace 01"; color: "#e2e8f0"; font.pixelSize: 13 }
-            Rectangle { width: 1; height: 22; color: "#45617d" }
+            Text { text: "Workspace 01"; color: "#d9e8f4"; font.pixelSize: 13 }
+            Rectangle { width: 1; height: 23; color: "#35516d" }
             Button {
-                text: "›_ Matrix CLI"
-                onClicked: root.notice = backend.launchMatrix() ? "Terminal opened" : "Install xterm, kitty, konsole, gnome-terminal or xfce4-terminal"
+                text: "›_  Matrix CLI"
+                onClicked: root.openMatrix()
+                Accessible.name: "Open Matrix terminal"
             }
         }
     }
 
     Rectangle {
         id: rail
-        width: 92; anchors.top: header.bottom; anchors.bottom: parent.bottom
-        color: "#990a1929"
+        width: 87
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        color: "#c00a1a2b"
+        border.color: "#172e4b"
         Column {
-            anchors.top: parent.top; anchors.horizontalCenter: parent.horizontalCenter; anchors.topMargin: 30
-            spacing: 24
+            anchors.top: parent.top
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.topMargin: 28
+            spacing: 20
             Repeater {
-                model: [{symbol: "⌂", title:"Home"}, {symbol:"⌘", title:"Apps"}, {symbol:"⌁", title:"Matrix"}, {symbol:"⚙", title:"Settings"}]
+                model: [
+                    {glyph: "⌂", label: "Home"},
+                    {glyph: "▦", label: "Apps"},
+                    {glyph: ">_", label: "Matrix"},
+                    {glyph: "⚙", label: "Settings"}
+                ]
                 delegate: Column {
-                    spacing: 4
-                    anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
+                    required property var modelData
+                    required property int index
+                    spacing: 5
                     Rectangle {
-                        width: 54; height: 48; radius: 12
-                        color: "#193650"; border.color: "#367ba3"
-                        Text { anchors.centerIn: parent; text: modelData.symbol; color:"#7dd3fc"; font.pixelSize: 26 }
-                        MouseArea {
+                        width: 55; height: 48; radius: 12
+                        color: railButton.hovered ? "#245176" : "#16334f"
+                        border.color: railButton.activeFocus ? "#eabf72" : "#3a7ba0"
+                        Text {
+                            anchors.centerIn: parent
+                            text: modelData.glyph
+                            color: "#8fe8fa"
+                            font.pixelSize: 23
+                        }
+                        Button {
+                            id: railButton
                             anchors.fill: parent
+                            opacity: 0
+                            Accessible.name: modelData.label
                             onClicked: {
-                                if (index === 1) root.showAppList = !root.showAppList
-                                else if (index === 2) root.notice = backend.launchMatrix() ? "Matrix terminal opened" : "No compatible terminal installed"
+                                if (index === 1) {
+                                    root.showAppList = !root.showAppList
+                                    if (root.showAppList) searchField.forceActiveFocus()
+                                } else if (index === 2) root.openMatrix()
                                 else if (index === 3) root.reducedMotion = !root.reducedMotion
-                                else root.notice = "NEO Desktop • home"
+                                else root.notice = "NEO Workspace • Home"
                             }
                         }
                     }
-                    Text { width: 54; horizontalAlignment: Text.AlignHCenter; text: modelData.title; color:"#c3d5e6"; font.pixelSize: 11 }
+                    Text {
+                        width: 55
+                        horizontalAlignment: Text.AlignHCenter
+                        text: modelData.label
+                        color: "#c0d6e9"
+                        font.pixelSize: 11
+                    }
                 }
             }
         }
     }
 
     Column {
-        anchors.left: rail.right; anchors.leftMargin: 34; anchors.top: header.bottom; anchors.topMargin: 40
-        spacing: 12
-        Text { text: "NEO WORKSPACE"; color: "#67e8f9"; font.pixelSize: 28; font.bold: true }
-        Text { text: "Build · Learn · Code · Secure · Deploy"; color:"#d0d9e9"; font.pixelSize: 15 }
-        Rectangle { height: 2; width: 220; color: "#b794f4" }
-        Text { text: "Your first working desktop prototype"; color:"#b3c7da"; font.pixelSize: 13 }
+        anchors.left: rail.right
+        anchors.leftMargin: 34
+        anchors.top: header.bottom
+        anchors.topMargin: 42
+        spacing: 9
+        Text { text: "NEO WORKSPACE"; color: "#72e6f7"; font.pixelSize: 29; font.bold: true }
+        Text { text: "Build · Learn · Code · Secure · Deploy"; color: "#d6dfef"; font.pixelSize: 15 }
+        Rectangle { width: 220; height: 2; color: "#b794f4" }
+        Text { text: "A real desktop preview • The full operating system is still under development"; color: "#aabdd1"; font.pixelSize: 12 }
     }
 
     Rectangle {
-        anchors.top: header.bottom; anchors.topMargin: 28
-        anchors.right: parent.right; anchors.rightMargin: 26
-        width: 255; height: 128; radius: 14
-        color: "#dd0c2036"; border.color: "#346a8f"
-        Column {
-            anchors.fill: parent; anchors.margins: 16; spacing: 13
-            Text { text: "NEO CONTROL"; color: "#83e5f5"; font.bold: true; font.pixelSize: 14 }
-            Text { text: "Desktop: prototype session"; color: "#e3eef9" }
-            Row {
-                spacing: 10
-                Switch { id: motionToggle; checked: !root.reducedMotion; onToggled: root.reducedMotion = !checked }
-                Text { text: "Motion effects"; color: "white"; anchors.verticalCenter: parent.verticalCenter }
+        anchors.top: header.bottom
+        anchors.topMargin: 28
+        anchors.right: parent.right
+        anchors.rightMargin: 24
+        width: 270
+        height: 148
+        radius: 14
+        color: "#ea11263c"
+        border.color: "#366b91"
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 15
+            spacing: 6
+            Text { text: "NEO CONTROL"; color: "#9befff"; font.bold: true; font.pixelSize: 14 }
+            Text { text: "Preview session · Ubuntu host"; color: "#d2e3f1"; font.pixelSize: 12 }
+            RowLayout {
+                Switch {
+                    id: motionToggle
+                    checked: !root.reducedMotion
+                    onToggled: root.reducedMotion = !checked
+                    Accessible.name: "Enable interface animations"
+                }
+                Text { text: "Motion effects"; color: "#f1f5f9"; font.pixelSize: 13 }
+                Item { Layout.fillWidth: true }
             }
-            Text { text: "Real system statistics come later"; color:"#94a3b8"; font.pixelSize: 11 }
+            Text {
+                text: "App icons are sourced from your system theme"
+                wrapMode: Text.WordWrap
+                color: "#9caec0"
+                font.pixelSize: 11
+                Layout.fillWidth: true
+            }
         }
     }
 
     Rectangle {
         id: appPanel
         visible: root.showAppList
-        anchors.left: rail.right; anchors.leftMargin: 26
-        anchors.top: header.bottom; anchors.topMargin: 166
-        width: 390; height: Math.min(350, root.height - 240)
-        radius: 15; color: "#f00d2035"; border.color:"#4f8bae"; z: 10
+        z: 10
+        anchors.left: rail.right
+        anchors.leftMargin: 28
+        anchors.top: header.bottom
+        anchors.topMargin: 175
+        width: Math.min(455, root.width - 165)
+        height: Math.min(440, root.height - 255)
+        radius: 15
+        color: "#f00e2135"
+        border.color: "#568bb0"
         ColumnLayout {
-            anchors.fill: parent; anchors.margins: 14
-            Text { text: "Installed applications • click to pin"; color:"white"; font.pixelSize: 15; font.bold: true }
+            anchors.fill: parent
+            anchors.margins: 14
+            spacing: 8
+            RowLayout {
+                Text { text: "Installed applications"; color: "#effaff"; font.pixelSize: 17; font.bold: true }
+                Item { Layout.fillWidth: true }
+                Button { text: "Close"; onClicked: root.showAppList = false }
+            }
+            TextField {
+                id: searchField
+                Layout.fillWidth: true
+                placeholderText: "Search installed apps..."
+                onTextChanged: root.searchText = text.toLowerCase()
+                Accessible.name: "Search installed applications"
+            }
             ListView {
-                Layout.fillHeight: true; Layout.fillWidth: true; clip: true
-                model: backend.availableApps; spacing: 3
+                id: appList
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                clip: true
+                spacing: 3
+                model: backend.availableApps
                 delegate: Rectangle {
-                    width: ListView.view.width; height: 40; radius: 7
-                    color: index % 2 ? "#17334b" : "#11283f"
+                    required property var modelData
+                    required property int index
+                    width: appList.width
+                    height: modelData.name.toLowerCase().indexOf(root.searchText) >= 0 ? 48 : 0
+                    visible: height > 0
+                    radius: 7
+                    color: index % 2 ? "#1a354d" : "#132b43"
                     RowLayout {
-                        anchors.fill: parent; anchors.margins: 8
-                        Text { text: modelData.name; color: "#e2efff"; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Button { text:"Pin"; onClicked: { backend.pin(modelData.id); root.notice = "Pinned " + modelData.name } }
+                        anchors.fill: parent
+                        anchors.margins: 7
+                        spacing: 10
+                        Image {
+                            source: "image://appicons/" + modelData.id
+                            sourceSize.width: 27; sourceSize.height: 27
+                            Layout.preferredWidth: 27; Layout.preferredHeight: 27
+                            fillMode: Image.PreserveAspectFit
+                        }
+                        Text {
+                            text: modelData.name
+                            color: "#e8f5ff"
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+                        Button {
+                            text: "Open"
+                            onClicked: root.openApp(modelData.id, modelData.name)
+                        }
+                        Button {
+                            text: "Pin"
+                            onClicked: {
+                                root.notice = backend.pin(modelData.id)
+                                    ? "Pinned " + modelData.name
+                                    : modelData.name + " is already pinned"
+                            }
+                        }
                     }
                 }
             }
@@ -146,39 +281,84 @@ ApplicationWindow {
     }
 
     Rectangle {
-        anchors.left: rail.right; anchors.leftMargin: 30; anchors.bottom: parent.bottom; anchors.bottomMargin: 22
-        width: 490; height: 44; radius: 12
-        color:"#db0c1b30"; border.color:"#305f82"
+        anchors.left: rail.right
+        anchors.leftMargin: 30
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 20
+        width: Math.min(490, root.width - 570)
+        height: 42
+        radius: 10
+        color: "#e80c1d30"
+        border.color: "#345d7f"
         Text {
-            anchors.centerIn: parent; color:"#c7e3fb"; font.pixelSize: 12
-            width: parent.width - 25; elide: Text.ElideRight
+            anchors.fill: parent
+            anchors.margins: 12
+            verticalAlignment: Text.AlignVCenter
             text: root.notice
+            elide: Text.ElideRight
+            color: "#d0e9fa"
+            font.pixelSize: 12
         }
     }
 
     Item {
         id: orbit
-        width: 365; height: 350
-        anchors.right: parent.right; anchors.rightMargin: 16
-        anchors.bottom: parent.bottom; anchors.bottomMargin: 10
-        property bool expanded: false
-        property real orbitRadius: expanded ? 126 : 84
-        Behavior on orbitRadius { enabled: !root.reducedMotion; NumberAnimation { duration: 240; easing.type: Easing.OutCubic } }
+        width: 340
+        height: 335
+        anchors.right: parent.right
+        anchors.rightMargin: 20
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 5
+        property real orbitRadius: root.dockExpanded ? 122 : 88
+
+        Behavior on orbitRadius {
+            enabled: !root.reducedMotion
+            NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
+        }
+
         Rectangle {
             anchors.centerIn: parent
-            width: orbit.orbitRadius * 2 + 25; height: width; radius: width / 2
-            color: "transparent"; border.color: "#468cd0"; border.width: 2; opacity: 0.9
+            width: orbit.orbitRadius * 2 + 24
+            height: width
+            radius: width / 2
+            color: "#081c3040"
+            border.color: "#4f98cc"
+            border.width: 2
         }
         Rectangle {
             anchors.centerIn: parent
-            width: 90; height: 90; radius: 45
+            width: orbit.orbitRadius * 2 - 24
+            height: width
+            radius: width / 2
+            color: "transparent"
+            border.color: "#7c4ea0"
+            border.width: 1
+            opacity: 0.7
+        }
+        Rectangle {
+            id: dockCenter
+            anchors.centerIn: parent
+            width: 88
+            height: 88
+            radius: 44
             gradient: Gradient {
-                GradientStop { position: 0; color: "#385e9a" }
-                GradientStop { position: 1; color: "#182b59" }
+                GradientStop { position: 0; color: "#385b9a" }
+                GradientStop { position: 1; color: "#19294b" }
             }
-            border.color:"#b88df9"; border.width: 3
-            Text { anchors.centerIn: parent; text: "◈"; color:"#8af1fc"; font.pixelSize: 44 }
-            MouseArea { anchors.fill: parent; onClicked: orbit.expanded = !orbit.expanded }
+            border.color: "#c499f7"
+            border.width: 3
+            Text {
+                anchors.centerIn: parent
+                text: "◈"
+                color: "#a0f8ff"
+                font.pixelSize: 42
+            }
+            Button {
+                anchors.fill: parent
+                opacity: 0
+                Accessible.name: root.dockExpanded ? "Collapse orbital dock" : "Expand orbital dock"
+                onClicked: root.dockExpanded = !root.dockExpanded
+            }
         }
         Repeater {
             model: backend.pinnedApps
@@ -188,42 +368,68 @@ ApplicationWindow {
                 readonly property var appInfo: backend.appById(modelData)
                 readonly property int total: Math.max(1, backend.pinnedApps.length)
                 readonly property real angle: (-Math.PI / 2) + (2 * Math.PI * index / total)
-                width: 64; height: 64; radius: 32
-                x: orbit.width/2 + Math.cos(angle)*orbit.orbitRadius - width/2
-                y: orbit.height/2 + Math.sin(angle)*orbit.orbitRadius - height/2
-                color: "#182f53"; border.color: "#65dcef"; border.width: 2
-                scale: orbit.expanded ? 1.1 : 0.92
-                Behavior on scale { enabled: !root.reducedMotion; NumberAnimation { duration: 200 } }
+                width: 65; height: 65; radius: 33
+                x: orbit.width / 2 + Math.cos(angle) * orbit.orbitRadius - width / 2
+                y: orbit.height / 2 + Math.sin(angle) * orbit.orbitRadius - height / 2
+                color: "#1b3150"
+                border.color: iconMouse.containsMouse ? "#efcb8f" : "#6bd9f4"
+                border.width: 2
+                scale: root.dockExpanded ? 1.05 : 0.95
+                Behavior on scale {
+                    enabled: !root.reducedMotion
+                    NumberAnimation { duration: 180 }
+                }
                 Column {
-                    anchors.centerIn: parent; spacing: 2
-                    Text {
+                    anchors.centerIn: parent
+                    spacing: 1
+                    Image {
+                        id: appIcon
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: appInfo.name ? appInfo.name.charAt(0).toUpperCase() : "?"
-                        color: "#ebffff"; font.pixelSize: 22; font.bold: true
+                        source: "image://appicons/" + modelData
+                        sourceSize.width: 31
+                        sourceSize.height: 31
+                        width: 31; height: 31
+                        fillMode: Image.PreserveAspectFit
                     }
                     Text {
-                        width: 58; horizontalAlignment: Text.AlignHCenter; elide: Text.ElideRight
-                        text: appInfo.name || "App"; color: "white"; font.pixelSize: 10
+                        visible: appIcon.status !== Image.Ready
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: appInfo.name ? appInfo.name.charAt(0) : "?"
+                        color: "#e9ffff"
+                        font.pixelSize: 20
+                        font.bold: true
+                    }
+                    Text {
+                        width: 60
+                        horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideRight
+                        text: appInfo.name || "App"
+                        color: "#e5f3fd"
+                        font.pixelSize: 10
                     }
                 }
                 MouseArea {
-                    anchors.fill: parent; acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    id: iconMouse
+                    anchors.fill: parent
                     hoverEnabled: true
-                    onEntered: orbit.expanded = true
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    onEntered: root.dockExpanded = true
                     onClicked: mouse => {
                         if (mouse.button === Qt.RightButton) {
-                            backend.unpin(modelData)
-                            root.notice = "Removed pin"
+                            root.notice = backend.unpin(modelData) ? "Unpinned " + appInfo.name : "Cannot unpin"
                         } else {
-                            root.notice = backend.launch(modelData) ? "Launched " + appInfo.name : "Could not launch " + appInfo.name + " (is gio installed?)"
+                            root.openApp(modelData, appInfo.name)
                         }
                     }
                 }
             }
         }
         Text {
-            anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.bottom
-            text: "ORBITAL DOCK  •  click center to expand"; color:"#b5d9ee"; font.pixelSize: 11
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            text: "ORBITAL DOCK  ·  right-click icon to unpin"
+            color: "#bddbeb"
+            font.pixelSize: 11
         }
     }
 }
