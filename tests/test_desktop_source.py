@@ -34,7 +34,10 @@ class DesktopSourceTests(unittest.TestCase):
         for expected in ("backend.pinnedApps", "backend.availableApps",
                          "backend.launch(appId)", "backend.launchMatrix()",
                          "image://appicons/", "backend.pin(modelData.id)",
-                         "reducedMotion", "root.dockExpanded"):
+                         "reducedMotion", "root.dockExpanded",
+                         'sequence: "Ctrl+Space"', 'sequence: "Ctrl+K"',
+                         'sequence: "Escape"', "dockButton.activeFocus",
+                         "focusPolicy: Qt.StrongFocus"):
             with self.subTest(expected=expected):
                 self.assertIn(expected, qml)
 
