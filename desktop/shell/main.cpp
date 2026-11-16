@@ -13,6 +13,8 @@
 #include <QQuickImageProvider>
 #include <QPixmap>
 #include <QHash>
+#include <QImageReader>
+#include <QUrl>
 #include "MatrixPty.h"
 #include <algorithm>
 
@@ -39,6 +41,8 @@ class DesktopBackend : public QObject {
     Q_OBJECT
     Q_PROPERTY(QStringList pinnedApps READ pinnedApps NOTIFY pinnedAppsChanged)
     Q_PROPERTY(QVariantList availableApps READ availableApps CONSTANT)
+    Q_PROPERTY(QString wallpaperUrl READ wallpaperUrl NOTIFY wallpaperUrlChanged)
+    Q_PROPERTY(QString accentTheme READ accentTheme NOTIFY accentThemeChanged)
 public:
     explicit DesktopBackend(QObject *parent = nullptr) : QObject(parent) {
         QStringList dirs = QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation);
@@ -70,6 +74,14 @@ public:
         for (const auto &id : ids)
             apps.append(QVariantMap{{"id", id}, {"name", appNames.value(id)}});
         QSettings settings("NEO-OS", "DesktopPreview");
+        accent_ = settings.value("appearance/accent", "cyan").toString();
+        if (accent_ != "cyan" && accent_ != "violet") accent_ = "cyan";
+        const QString oldWallpaper = settings.value("appearance/wallpaper").toString();
+        if (!oldWallpaper.isEmpty()) {
+            const QString local = QUrl(oldWallpaper).toLocalFile();
+            if (!local.isEmpty() && QFileInfo(local).isReadable() &&
+                QImageReader(local).canRead()) wallpaper_ = oldWallpaper;
+        }
         const QStringList stored = settings.value("dock/pins").toStringList();
         for (const auto &id : stored)
             if (appPaths.contains(id) && !pins.contains(id)) pins << id;
@@ -79,6 +91,34 @@ public:
                 pins << id;
             }
         }
+    }
+    QString wallpaperUrl() const { return wallpaper_; }
+    QString accentTheme() const { return accent_; }
+    Q_INVOKABLE bool setWallpaperPath(const QString &input) {
+        const QString path = input.startsWith("file:") ? QUrl(input).toLocalFile() : input;
+        if (!path.isEmpty()) {
+            QFileInfo file(path);
+            if (!file.isFile() || !file.isReadable() || !QImageReader(path).canRead())
+                return false;
+        }
+        const QString resolved = path.isEmpty() ? QString() : QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()).toString();
+        if (wallpaper_ == resolved) return true;
+        wallpaper_ = resolved;
+        QSettings settings("NEO-OS", "DesktopPreview");
+        settings.setValue("appearance/wallpaper", wallpaper_);
+        settings.sync();
+        emit wallpaperUrlChanged();
+        return true;
+    }
+    Q_INVOKABLE bool setAccentTheme(const QString &theme) {
+        if (theme != "cyan" && theme != "violet") return false;
+        if (accent_ == theme) return true;
+        accent_ = theme;
+        QSettings settings("NEO-OS", "DesktopPreview");
+        settings.setValue("appearance/accent", accent_);
+        settings.sync();
+        emit accentThemeChanged();
+        return true;
     }
     QStringList pinnedApps() const { return pins; }
     QVariantList availableApps() const { return apps; }
@@ -114,6 +154,8 @@ public:
     }
 signals:
     void pinnedAppsChanged();
+    void wallpaperUrlChanged();
+    void accentThemeChanged();
 private:
     void persist() {
         QSettings settings("NEO-OS", "DesktopPreview");
@@ -123,6 +165,8 @@ private:
     QHash<QString, QString> appPaths, appNames, appIcons;
     QVariantList apps;
     QStringList pins;
+    QString wallpaper_;
+    QString accent_ = "cyan";
 };
 
 int main(int argc, char *argv[]) {
