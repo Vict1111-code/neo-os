@@ -27,3 +27,8 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - User reports 6/6 manual Ubuntu checks passed: Ctrl+Space, Ctrl+K, Escape, dock-center keyboard activation, real app launching, and pin persistence.
 - GitHub Actions PR #4 run #14 built successfully and passed static source tests; broader automated GUI interaction and independent review were not performed.
 - Remaining engineering work: real window management integration, fuller keyboard/a11y checks, reliable app-state tracking, and LFS integration.
+
+## Issue #5 — Embedded Matrix PTY prototype
+- On `feat/5-matrix-pty-prototype`, `MatrixPty.h/.cpp` supplies a limited `forkpty()` shell; `MatrixTerminal.qml` renders output and sends line-oriented input.
+- ADR-011 records the limited PTY prototype versus mature terminal widget alternatives. **Not a full terminal emulator**; no claim of full Unicode, ANSI, resize, per-keystroke shell control or complete cleanup without testing.
+- Confirm CI build, Ubuntu GUI interaction, Ctrl+C, Stop/Start, regression checks and shell cleanup before merging or closing Issue #5.
