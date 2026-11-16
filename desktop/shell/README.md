@@ -68,3 +68,28 @@ python3 -m unittest discover -s tests -p 'test_desktop_source.py' -v
 ```
 
 Record the observed results, warnings and screenshots in `docs/PROJECT_STATE.md`.
+
+## Matrix CLI embedded PTY proof of concept — Issue #5 (unverified)
+
+The Matrix CLI button now proposes opening an **embedded PTY-backed shell panel** instead of only launching a separate terminal. The external terminal remains available as a fallback from inside the panel.
+
+### Dependencies
+The Linux prototype uses `forkpty()` from libutil and the system's `/bin/bash`. The existing Qt 6/CMake prerequisites still apply. Linux only; no change to host desktop/session/bootloader.
+
+### Manual tests on Ubuntu (run before merging)
+1. Build this issue branch using the regular CMake/Ninja commands. Open the desktop preview.
+2. Click **Matrix CLI**. A green-on-black **Matrix CLI • Linux PTY preview** panel should appear.
+3. Type `pwd` and press Enter; your current working directory should appear.
+4. Type `echo NEO-OS`; output should contain `NEO-OS`.
+5. Run `sleep 20`, then click **Ctrl+C**; the command should be interrupted.
+6. Click **Stop**, observe the shell stop, then **Start** and run `echo restart`.
+7. Close and reopen the panel; verify the desktop continues responding and the session behavior is clear.
+8. Confirm orbital dock launching, Ctrl+Space, Ctrl+K, Escape and pinned apps still work. Copy build errors or screenshot to the issue/PR.
+
+**Known limitations:** This is *not* a complete VT/ANSI terminal emulator. It uses a line-input box (no per-keystroke shell editing), a simple text output view, fixed 80x24 PTY geometry, partial ANSI stripping and approximate UTF-8 chunk decoding. Full-screen editors, interactive TUIs, clipboard fidelity, resize signaling and process-group behavior need stronger testing and a mature terminal engine. Closing the panel hides it; **Stop** ends the shell. It is a real user shell and is **not sandboxed**. Never enter destructive commands merely to test the interface.
+
+### Learning concepts
+- `forkpty()` creates a PTY master/slave pair and a child process connected to the slave.
+- `QSocketNotifier` integrates the PTY file descriptor into Qt's event loop without blocking the UI.
+- QML property bindings expose shell output and running state to the frontend.
+- `Ctrl+C` is written as ASCII ETX to the PTY; the line discipline can deliver SIGINT to the foreground process group.
