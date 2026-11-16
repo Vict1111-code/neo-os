@@ -1,0 +1,27 @@
+name: NEO Core host audit
+on:
+  pull_request:
+    paths:
+      - 'build/lfs/**'
+      - '.github/workflows/lfs-host-audit.yml'
+  push:
+    paths:
+      - 'build/lfs/**'
+      - '.github/workflows/lfs-host-audit.yml'
+jobs:
+  read-only-audit:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bash syntax
+        run: bash -n build/lfs/host-audit.sh
+      - name: Report host environment
+        run: bash build/lfs/host-audit.sh "$GITHUB_WORKSPACE"
+      - name: Invalid path must fail without modifying host
+        run: |
+          if bash build/lfs/host-audit.sh /this/path/should/not/exist; then
+            echo "Expected nonzero exit for missing directory" >&2
+            exit 1
+          fi
