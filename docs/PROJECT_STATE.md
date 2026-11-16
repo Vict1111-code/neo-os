@@ -143,3 +143,10 @@ These results are self-reported manual tests, not independent automated PTY life
 - **Do not misrepresent** visual-only services (AI, app market, devices, workspaces, telemetry) as actually integrated; they are clearly labeled previews.
 - **Validation pending**: CI build/QML parsing, live Ubuntu side-by-side screenshots, wallpaper persistence, 1024×640 responsiveness, keyboard/Matrix regression and independent PR review.
 - This is a **stacked** branch/PR over unmerged PR #6. Need PR #6 merged first, then retarget this change to master and rerun CI before merge.
+
+### Issue #9 — Wallpaper asset pack & visual refinement
+- Four user-selected wallpapers have been packaged for local download as `NEO-OS_Celestial_Wallpapers_v0.3.zip`. The zip is generated in conversation files, **not stored in GitHub**; user must extract and run the checked-in installer script.
+- The new `desktop/shell/install-wallpapers.sh` installs image assets to `$XDG_DATA_HOME/neo-os/wallpapers` or `$HOME/.local/share/neo-os/wallpapers` without elevated privileges.
+- C++ scans installed local image assets; first sorted image becomes default if no valid saved wallpaper exists; saves wallpaper selection, neon accent and dim strength.
+- QML Settings now presents actual thumbnails, adjustable wallpaper dim/contrast and theme controls; orbital ring glow and bottom dock are refined.
+- **Pending:** CI verification on latest commit, user Ubuntu screenshots, image pack installation, responsive comparison and independently reviewed PR #10. PR #10 remains stacked on open Matrix PR #6.
