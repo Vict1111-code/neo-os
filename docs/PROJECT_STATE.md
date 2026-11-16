@@ -76,3 +76,10 @@ Every next milestone must record actual tests, warnings, changed paths, branch/c
 - Screenshots provide evidence for window rendering, opened app panel and focus styling, **not** conclusive evidence that Ctrl+Space, Ctrl+K, Escape, app launch, pin persistence, or automated tests pass.
 - The user also correctly explained QML reactive bindings: changing property state causes dependent UI properties to update automatically.
 - **Outstanding before merge:** run and report the three shortcuts, dock center Enter/Space, a real app launch, pin persistence, and CI/build result (no recorded CI checks or PR reviews currently).
+
+## Issue #3 — Final acceptance evidence (2026-11-16)
+- **User-reported Ubuntu manual tests: 6/6 pass**: Ctrl+Space dock toggle; Ctrl+K app search focus; Escape dismiss; focused dock center Enter/Space; launch installed application; pinned app retained across restart.
+- **GitHub Actions:** `NEO Desktop preview` run #14 (`43926266948`) concluded **success** for PR #4 head `6790733`, with source tests, Qt dependency installation, configure, compile, and binary upload steps all successful.
+- **Independent review:** no reviewer submissions recorded at the time of this entry. A source inspection was performed in the assistant session; this is not independent approval.
+- Functionality now has manual and CI evidence. No claim is made that this is a fully installed NEO-OS operating system or that broader accessibility testing is complete.
+- Next: revalidate the final PR head after the documentation updates, merge if allowed by repository rules, verify Issue #3 closure, and begin a separately tracked next issue.
