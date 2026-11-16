@@ -69,3 +69,10 @@ Every next milestone must record actual tests, warnings, changed paths, branch/c
 - CI Ubuntu package list and Python static source checks updated; docs and agent handoff included.
 - **Build/CI/manual tests: NOT VERIFIED for this branch.** Source edits alone do not prove keyboard behavior.
 - Next: review PR, inspect CI; run application locally and report focus/keyboard behavior before accepting/merging.
+
+### User-provided visual validation — 2026-11-16 18:10
+- Two screenshots show the NEO Desktop v0.2 preview running on Ubuntu, the revised real application icons, the installed-app panel with Search/Open/Pin, and a gold highlight around the focused orbital dock center.
+- A separate Ubuntu terminal window is visible, and the preview reports "Matrix terminal launch requested"; execution of commands inside this terminal is not established from the screenshots.
+- Screenshots provide evidence for window rendering, opened app panel and focus styling, **not** conclusive evidence that Ctrl+Space, Ctrl+K, Escape, app launch, pin persistence, or automated tests pass.
+- The user also correctly explained QML reactive bindings: changing property state causes dependent UI properties to update automatically.
+- **Outstanding before merge:** run and report the three shortcuts, dock center Enter/Space, a real app launch, pin persistence, and CI/build result (no recorded CI checks or PR reviews currently).
