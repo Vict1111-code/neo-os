@@ -14,6 +14,7 @@ ApplicationWindow {
 
     property bool reducedMotion: false
     property bool showAppList: false
+    property bool showMatrix: false
     property bool dockExpanded: false
     property string notice: "Desktop prototype ready • Select an application"
     property string searchText: ""
@@ -35,17 +36,18 @@ ApplicationWindow {
     Shortcut {
         sequence: "Escape"
         context: Qt.WindowShortcut
-        enabled: root.showAppList || root.dockExpanded
+        enabled: root.showAppList || root.dockExpanded || root.showMatrix
         onActivated: {
-            if (root.showAppList) root.showAppList = false
+            if (root.showMatrix) root.showMatrix = false
+            else if (root.showAppList) root.showAppList = false
             else root.dockExpanded = false
         }
     }
 
     function openMatrix() {
-        notice = backend.launchMatrix()
-            ? "Matrix terminal launch requested"
-            : "No supported terminal installed (xterm, kitty, konsole...)"
+        showMatrix = true
+        if (!matrixPty.running && !matrixPty.start())
+            notice = "Unable to start embedded Matrix PTY"
     }
     function openApp(appId, appName) {
         notice = backend.launch(appId)
@@ -322,6 +324,16 @@ ApplicationWindow {
             color: "#d0e9fa"
             font.pixelSize: 12
         }
+    }
+
+    MatrixTerminal {
+        id: matrixPanel
+        visible: root.showMatrix
+        z: 20
+        anchors.centerIn: parent
+        width: Math.min(760, root.width - 125)
+        height: Math.min(470, root.height - 125)
+        onCloseRequested: root.showMatrix = false
     }
 
     Item {
