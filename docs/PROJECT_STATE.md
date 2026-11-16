@@ -44,3 +44,17 @@ Prototype runs as a normal application window. It must never silently replace ho
 
 ## Handoff requirements
 Every next milestone must record actual tests, warnings, changed paths, branch/commits and remaining tasks; never claim a UI works solely from source code.
+
+## Phase 1 / Track A — Desktop Preview 0.2 source iteration (2026-11-16)
+- Replaced the large decorative center rings with subtle low-contrast background accents and refined the orbital dock layout.
+- Added a Qt icon image provider that reads icon names/paths from installed .desktop entries; UI falls back to initials when no image is found.
+- Added search/filter, Open and Pin controls to the installed-app panel; preserved app launch and saved pins.
+- Updated desktop README and source-contract tests to reflect new UI/backend.
+- Verified the updated files exist in GitHub and inspected source for required QML/backend/test identifiers; these are **static source checks only**, not a compiled GUI run.
+- **0.2 Qt compile: NOT RUN**; **0.2 UI launch/interaction: NOT VERIFIED**. Previous 0.1 preview successfully launched on user's Ubuntu desktop, per screenshot.
+
+### Next validation
+1. User runs `git pull --ff-only origin master`, CMake build and preview executable on Ubuntu.
+2. Verify real icons, opening installed applications, pin/unpin persistence, searchable app list and dock expansion.
+3. Collect compiler/QML errors or screenshot and fix if necessary.
+4. Add genuine keyboard focus handling and proper terminal session integration after successful runtime validation.
