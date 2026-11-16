@@ -83,3 +83,54 @@ Every next milestone must record actual tests, warnings, changed paths, branch/c
 - **Independent review:** no reviewer submissions recorded at the time of this entry. A source inspection was performed in the assistant session; this is not independent approval.
 - Functionality now has manual and CI evidence. No claim is made that this is a fully installed NEO-OS operating system or that broader accessibility testing is complete.
 - Next: revalidate the final PR head after the documentation updates, merge if allowed by repository rules, verify Issue #3 closure, and begin a separately tracked next issue.
+
+## Issue #5 — Embedded Matrix CLI PTY prototype (pending PR, 2026-11-16)
+- Created Linux-only `MatrixPty` backend using `forkpty()`, `QSocketNotifier`, `waitpid`, bounded text output, and user-shell input; no privilege escalation.
+- Added `MatrixTerminal.qml` overlay showing output, line input, Send, Ctrl+C, Stop/Start and external terminal fallback.
+- Wired CMake, QML context and UI; documented limitations under ADR-011.
+- Updated static source-contract checks and Ubuntu manual test instructions.
+- **Status: source only. Qt compilation, runtime shell commands, PTY lifecycle and regression tests not yet verified.** Do not treat these as a completed Matrix CLI.
+- Next: submit PR for CI and user manual tests, fix failures; evaluate maintained full terminal widget before production integration.
+
+### Embedded PTY Ubuntu runtime screenshot evidence — 2026-11-16 19:29
+- User supplied a screenshot showing **Matrix CLI • Linux PTY preview** embedded within the NEO Desktop window on Ubuntu.
+- In-panel command/output pairs are visible: `pwd` → `/home/admin/neo-os`; `echo NEO-OS` → `NEO-OS`; `whoami` → `admin`; `uname -s` → `Linux`. The prompt returns following each command. These establish basic line-oriented shell input/output on the user's Linux host.
+- GitHub Actions run #43931939690 passed static tests, Qt configure/compile, and artifact upload; no independent GitHub PR review is recorded.
+- **Still unverified:** Ctrl+C interrupting `sleep 20`, Stop/Start behavior, shell process cleanup, close/reopen, and dock regressions on this feature branch. Screenshot alone cannot establish these.
+- **Decision:** PR #6 and Issue #5 remain open until the remaining acceptance tests are evidenced and reviewed. The panel remains a prototype, not a complete VT terminal emulator.
+
+### User final interactive test report — 2026-11-16 19:45
+The user reported **PASS** for each of four Ubuntu functional checks:
+1. `sleep 20` interrupted by embedded Ctrl+C.
+2. Stop, Start, then `echo restart` succeeded.
+3. Closing and reopening the Matrix CLI kept the desktop responsive.
+4. Orbital dock and application launch regressions passed.
+
+These results are self-reported manual tests, not independent automated PTY lifecycle testing. An earlier screenshot verified commands `pwd`, `echo NEO-OS`, `whoami`, and `uname -s` with their expected outputs.
+
+### Automated and review gate check
+- Latest branch documentation commit `886a0e7` has successful GitHub Actions run #43940033625 (completed/success). Earlier source commit `843446c` passed run #43931939690.
+- At the latest inspection, zero GitHub PR reviews were submitted.
+- **Open process lifecycle risk:** `MatrixPty::stop()` sends SIGHUP/SIGKILL to the immediate Bash PID and reaps it, but does not explicitly enumerate or terminate all foreground process groups/descendants. The user test of Stop/Start is not sufficient evidence of no orphaned foreground processes.
+- **Open PR #6 and Issue #5 until cleanup behavior is validated and review requirements are resolved.** Do not claim production-quality terminal emulation.
+
+### Targeted background-process cleanup test — 2026-11-16 19:55
+- User ran `sleep 90 & echo $!` in Matrix CLI, stopped the shell and checked the resulting PID **77343** from the Ubuntu host.
+- Observed `ps -p 77343 -o pid,stat,cmd` output: only the header `PID STAT CMD`, with no matching process row.
+- **Result: PASS for this particular background process** — it was not present at inspection time. This is user-reported observational evidence, not a comprehensive verification of child process groups or all workloads.
+- GitHub Actions run #43942913609 succeeded on branch commit `dbc27a0`. No independent reviewer approval has been recorded.
+- Keep the incomplete descendant/process-group cleanup guarantee as an explicit limitation; require further review before claiming comprehensive lifecycle safety or stable terminal-emulator readiness.
+
+### PR #6 follow-up hardening — 2026-11-16
+- Updated `MatrixPty::stop()` to send SIGHUP to the foreground PTY job group (when separate) and to the shell process group; improved `waitpid` handling for an already-reaped child.
+- Added `MatrixPtySmoke.cpp`, a headless Qt Core + actual Linux PTY test of Bash output and Stop; registered it through CTest and GitHub Actions.
+- The integration test requires a standalone output line to avoid mistaking shell command echo for successful execution.
+- **Status:** New code and tests committed on PR #6 feature branch; new CI run and post-change Ubuntu runtime regression results are pending. Previously reported manual tests apply to the earlier implementation.
+- **Residual risk:** detached/disowned jobs may outlive the terminal; no general descendant supervisor has been implemented. Independent review remains outstanding.
+
+### Post-hardening Ubuntu regression result — 2026-11-16 20:25
+- User reports the updated desktop and Matrix CLI are "working fine" following the latest process-group cleanup changes.
+- This is **general user-reported success**, not an itemized retest transcript for each behavior; the earlier 4/4 interaction results apply to the pre-hardening version.
+- GitHub Actions run #43945489673 completed successfully for commit `ae7314b`, including live PTY integration smoke test, source tests, Qt build and artifact upload.
+- A targeted earlier background PID test passed. Detached descendant cleanup and full terminal emulation remain limitations.
+- **Independent PR review not yet recorded**. Keep PR #6 open pending required review; do not misrepresent generic "working fine" as full formal approval.
