@@ -2,25 +2,38 @@
 
 Updated: 2026-11-16
 
-## Verified
-- Project planning PRD and roadmap exist and were uploaded as repository text exports.
-- Root and subsystem agent instructions added to the repository.
-- GitHub repository is `Vict1111-code/neo-os`, branch `master`.
-
-## Not yet verified
-- No bootable NEO-OS build or LFS/QEMU boot.
-- No Qt/QML desktop implementation, application store, AI daemon or installer.
-- No completed hardware audit, release security review or CI test.
+## Verified GitHub documentation
+- PRD candidate export: `docs/PRD.md`.
+- Roadmap candidate export: `docs/ROADMAP.md`.
+- Root and eight subsystem AGENT.md instructions plus agent templates.
+- Draft system architecture: `docs/ARCHITECTURE.md`.
+- Draft service APIs: `docs/API_CONTRACTS.md`.
+- Draft distribution engineering: `docs/BUILD_AND_UPDATES.md`.
+- Draft threat model: `docs/SECURITY.md`.
+- Draft desktop design system: `docs/DESIGN_SYSTEM.md`.
+- Ten proposed ADRs at `docs/ADR/ADR-001.md` through `ADR-010.md`; none accepted.
 
 ## Current phase
-Phase 0 — architecture and technical foundation. Planning checklist is not equivalent to verified completion.
+Phase 0 — architecture and technical foundation. Architecture documentation has been committed, but formal decisions, environment testing, and implementation remain outstanding.
 
-## Next work
-1. Review and approve the PRD and roadmap text exports against original DOCX sources.
-2. Formalize ADRs and APIs.
-3. Validate host and isolated LFS prerequisites.
-4. Prototype Qt/QML orbital launcher.
-5. Capture exact tests, logs, screenshots and commit SHAs.
+## Not verified / not completed
+- No bootable NEO-OS build, LFS/QEMU console boot, physical hardware testing or CI execution.
+- No Qt/QML GUI implementation or orbital dock running in the OS.
+- No installer, package manager, AI daemon, app store or tested network security subsystem.
+- No signed software release.
+- No tested host hardware inventory, disk/virtualization audit or independent approval of PRD DOCX/Markdown parity.
+- Original binary PDF/DOCX/ZIP package and visual references have not been committed to GitHub.
 
-## Handoff requirements
-For every implementation: record changed files, issue/FR, commands, test results, blockers, and next concrete action. Never fabricate progress.
+## Next tasks (priority ordered)
+1. Verify PRD and roadmap text-export fidelity against the original DOCX documents; decide master versions.
+2. Review and approve or revise proposed ADR-001 to ADR-010, especially package selection and update/recovery design.
+3. Inventory development host OS, RAM, CPU, disk and virtualization; prepare isolated build environment.
+4. Implement minimal Qt/QML dock POC (real app launch, persistence, keyboard access, reduced-motion).
+5. Build isolated LFS base to QEMU console boot and capture verified logs.
+6. Add automated Markdown/ADR validity checks and build/desktop smoke tests when code exists.
+
+## Last documentation milestone
+Added architecture, API, build/update, security and design-system drafts, along with 10 proposed ADRs. These are documents only; no code execution was performed.
+
+## Handoff instructions
+For every implementation: record files changed, exact commands, test results and failures, risks, blockers and the next actionable task. No invented progress.
