@@ -120,3 +120,10 @@ These results are self-reported manual tests, not independent automated PTY life
 - **Result: PASS for this particular background process** — it was not present at inspection time. This is user-reported observational evidence, not a comprehensive verification of child process groups or all workloads.
 - GitHub Actions run #43942913609 succeeded on branch commit `dbc27a0`. No independent reviewer approval has been recorded.
 - Keep the incomplete descendant/process-group cleanup guarantee as an explicit limitation; require further review before claiming comprehensive lifecycle safety or stable terminal-emulator readiness.
+
+### PR #6 follow-up hardening — 2026-11-16
+- Updated `MatrixPty::stop()` to send SIGHUP to the foreground PTY job group (when separate) and to the shell process group; improved `waitpid` handling for an already-reaped child.
+- Added `MatrixPtySmoke.cpp`, a headless Qt Core + actual Linux PTY test of Bash output and Stop; registered it through CTest and GitHub Actions.
+- The integration test requires a standalone output line to avoid mistaking shell command echo for successful execution.
+- **Status:** New code and tests committed on PR #6 feature branch; new CI run and post-change Ubuntu runtime regression results are pending. Previously reported manual tests apply to the earlier implementation.
+- **Residual risk:** detached/disowned jobs may outlive the terminal; no general descendant supervisor has been implemented. Independent review remains outstanding.
