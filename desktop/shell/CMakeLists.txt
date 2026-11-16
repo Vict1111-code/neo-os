@@ -9,6 +9,7 @@ qt_add_executable(neo-desktop main.cpp)
 qt_add_qml_module(neo-desktop
   URI NeoDesktop
   VERSION 1.0
+  RESOURCE_PREFIX "/qt/qml"
   QML_FILES Main.qml
 )
 target_link_libraries(neo-desktop PRIVATE Qt6::Quick Qt6::Qml)
