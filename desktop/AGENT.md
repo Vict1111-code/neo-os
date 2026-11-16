@@ -11,3 +11,9 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - Keep layouts readable and uncluttered; references are design inspiration, not implemented evidence.
 - Test multiple resolutions, scale factors and reduced-effects mode; no invented compositor claims.
 - First deliverable: Qt shell and dock launching an allowlisted application with UI tests.
+
+## Current prototype status (2026-11-16)
+- Qt Quick shell proof-of-concept source committed under `desktop/shell/` (CMake, C++, QML, README).
+- Dock, pin persistence, installed application enumeration, and terminal launch are implemented **in source only**. No compilation, runtime UI behavior, or application launch has yet been verified.
+- Static source checks were inspected; GitHub CI workflow exists but passing execution is unverified.
+- Next: verify Qt CMake compilation and QML startup; confirm real app launch, pin persistence, reduced motion, and terminal behavior on supported Linux. Fix errors before claiming a working demo.
