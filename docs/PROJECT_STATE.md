@@ -98,3 +98,18 @@ Every next milestone must record actual tests, warnings, changed paths, branch/c
 - GitHub Actions run #43931939690 passed static tests, Qt configure/compile, and artifact upload; no independent GitHub PR review is recorded.
 - **Still unverified:** Ctrl+C interrupting `sleep 20`, Stop/Start behavior, shell process cleanup, close/reopen, and dock regressions on this feature branch. Screenshot alone cannot establish these.
 - **Decision:** PR #6 and Issue #5 remain open until the remaining acceptance tests are evidenced and reviewed. The panel remains a prototype, not a complete VT terminal emulator.
+
+### User final interactive test report — 2026-11-16 19:45
+The user reported **PASS** for each of four Ubuntu functional checks:
+1. `sleep 20` interrupted by embedded Ctrl+C.
+2. Stop, Start, then `echo restart` succeeded.
+3. Closing and reopening the Matrix CLI kept the desktop responsive.
+4. Orbital dock and application launch regressions passed.
+
+These results are self-reported manual tests, not independent automated PTY lifecycle testing. An earlier screenshot verified commands `pwd`, `echo NEO-OS`, `whoami`, and `uname -s` with their expected outputs.
+
+### Automated and review gate check
+- Latest branch documentation commit `886a0e7` has successful GitHub Actions run #43940033625 (completed/success). Earlier source commit `843446c` passed run #43931939690.
+- At the latest inspection, zero GitHub PR reviews were submitted.
+- **Open process lifecycle risk:** `MatrixPty::stop()` sends SIGHUP/SIGKILL to the immediate Bash PID and reaps it, but does not explicitly enumerate or terminate all foreground process groups/descendants. The user test of Stop/Start is not sufficient evidence of no orphaned foreground processes.
+- **Open PR #6 and Issue #5 until cleanup behavior is validated and review requirements are resolved.** Do not claim production-quality terminal emulation.
