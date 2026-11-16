@@ -17,3 +17,12 @@ if(UNIX AND NOT APPLE)
   target_link_libraries(neo-desktop PRIVATE util)
 endif()
 install(TARGETS neo-desktop RUNTIME DESTINATION bin)
+
+# A headless live-PTY integration check, independent from the graphical preview.
+include(CTest)
+if(BUILD_TESTING AND UNIX AND NOT APPLE)
+  qt_add_executable(neo-matrix-pty-smoke MatrixPtySmoke.cpp MatrixPty.cpp MatrixPty.h)
+  target_link_libraries(neo-matrix-pty-smoke PRIVATE Qt6::Core util)
+  add_test(NAME matrix-pty-shell-smoke COMMAND neo-matrix-pty-smoke)
+  set_tests_properties(matrix-pty-shell-smoke PROPERTIES TIMEOUT 15)
+endif()
