@@ -93,3 +93,23 @@ The Linux prototype uses `forkpty()` from libutil and the system's `/bin/bash`. 
 - `QSocketNotifier` integrates the PTY file descriptor into Qt's event loop without blocking the UI.
 - QML property bindings expose shell output and running state to the frontend.
 - `Ctrl+C` is written as ASCII ETX to the PTY; the line discipline can deliver SIGINT to the foreground process group.
+
+## Matrix PTY lifecycle hardening — Issue #5
+
+- Stop now sends SIGHUP to the active foreground process group (when distinct from Bash's group) and the Bash process group, before using a bounded wait and force-kill fallback for the direct Bash child.
+- This **does not** guarantee cleanup of detached, disowned or differently grouped background jobs. Full descendant supervision is future work; a PTY is not a sandbox.
+- A live, headless CTest smoke test uses the real `forkpty()` backend, runs a fixed `echo NEO_PTY_INTEGRATION_OK`, verifies actual output rather than merely the echoed command, and tests stopping the shell.
+- CI runs `ctest --test-dir out/neo-desktop --output-on-failure` after compilation.
+
+### Local verification of the hardening branch
+```bash
+cd ~/neo-os
+git fetch origin
+git switch feat/5-matrix-pty-prototype
+git pull --ff-only origin feat/5-matrix-pty-prototype
+cmake -S desktop/shell -B out/neo-desktop -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake --build out/neo-desktop
+ctest --test-dir out/neo-desktop --output-on-failure
+./out/neo-desktop/neo-desktop
+```
+Use `git status` before switching if there may be uncommitted changes. Verify Ctrl+C, Stop/Start and a foreground `sleep` again; don't run destructive commands. Update test results on PR #6.
