@@ -83,3 +83,9 @@ Every next milestone must record actual tests, warnings, changed paths, branch/c
 - **Independent review:** no reviewer submissions recorded at the time of this entry. A source inspection was performed in the assistant session; this is not independent approval.
 - Functionality now has manual and CI evidence. No claim is made that this is a fully installed NEO-OS operating system or that broader accessibility testing is complete.
 - Next: revalidate the final PR head after the documentation updates, merge if allowed by repository rules, verify Issue #3 closure, and begin a separately tracked next issue.
+
+## NEO Core parallel milestone — Issue #7 (branch pending review)
+- New `build/lfs/host-audit.sh` reports OS, architecture, CPU/RAM, disk free at a chosen existing directory, build tool presence/versions and QEMU/KVM hints **without sudo or changes**.
+- New `build/lfs/README.md` explains limits and commands; GitHub Actions `lfs-host-audit.yml` runs syntax, read-only inventory, and invalid-path checks.
+- **No user host report or QEMU/LFS boot has occurred in this milestone.** GitHub CI and code review are pending.
+- Issue #5/PR #6 Matrix CLI remains independent and open pending review.

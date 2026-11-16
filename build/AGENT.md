@@ -10,3 +10,8 @@ Scope: source verification, toolchains, LFS/BLFS recipes, virtual images, packag
 - LFS is not a package manager. Package ownership, dependency tracking, update and recovery need designs.
 - Do not embed signing keys, API tokens or secrets in builds.
 - Evidence: image hashes, QEMU invocation, boot logs, console login and clean shutdown.
+
+## Issue #7 — Host inventory
+- `build/lfs/host-audit.sh` is a read-only inventory helper, not the official LFS Host System Requirements validation or proof the host is ready.
+- `build/lfs/README.md` describes safe Ubuntu usage; run syntax and host-audit CI. Do not install, partition, mount, or change boot settings as part of this issue.
+- Follow up with LFS book version checks, dedicated image/virtual disk sizing and reproducible build environment, all tracked as separate issues.
