@@ -498,6 +498,7 @@ ApplicationWindow {
             }
         }
         Rectangle {
+            visible: root.height >= 760
             width: parent.width; height: 100; radius: 17
             color: "#df0b1734"; border.color: "#597dbe"
             Column {
@@ -510,6 +511,7 @@ ApplicationWindow {
     }
 
     Rectangle {
+        visible: root.height >= 760
         z: 5
         x: sideRail.x + sideRail.width + 18
         y: root.height - 143
@@ -547,8 +549,9 @@ ApplicationWindow {
         id: bottomDock
         z: 7
         height: 65
-        width: Math.min(800, root.width - 210)
-        x: (root.width - width) / 2
+        width: Math.min(800, root.width - sideRail.width - rightPanels.width - 75)
+        x: sideRail.x + sideRail.width +
+           (root.width - sideRail.x - sideRail.width - rightPanels.width - 24 - width) / 2
         y: root.height - 75
         radius: 30
         color: "#e0081730"
@@ -593,6 +596,7 @@ ApplicationWindow {
     }
 
     Rectangle {
+        visible: root.height >= 760
         z: 8
         x: 19
         y: root.height - 73
@@ -685,7 +689,7 @@ ApplicationWindow {
         visible: root.showSettings
         z: 31
         width: 460
-        height: 303
+        height: 343
         anchors.centerIn: parent
         radius: 18
         color: "#f20a1730"
@@ -707,7 +711,7 @@ ApplicationWindow {
                 id: wallpaperInput
                 Layout.fillWidth: true
                 placeholderText: "/home/you/Pictures/neo-wallpaper.webp"
-                text: backend.wallpaperUrl.toString().replace("file://", "")
+                text: decodeURIComponent(backend.wallpaperUrl.toString().replace("file://", ""))
                 Accessible.name: "Absolute local wallpaper file path"
             }
             RowLayout {
@@ -724,6 +728,12 @@ ApplicationWindow {
                         root.notice = "Default NEO celestial wallpaper restored"
                     }
                 }
+            }
+            CheckBox {
+                text: "Reduce interface animations"
+                checked: root.reducedMotion
+                onToggled: root.reducedMotion = checked
+                Accessible.name: "Reduce interface animations"
             }
             Text { text: "Accent theme"; color: "#ecfaff"; font.bold: true }
             RowLayout {
