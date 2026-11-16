@@ -148,3 +148,19 @@ No cloud image download or background networking is performed. A removed/unreada
 - Record CPU performance impact and preference for reduced motion. No animation should be required to operate core controls.
 
 This is **a regular Ubuntu window**, not yet an installed NEO-OS shell/compositor. Visual reference fidelity is iterative and must be verified by side-by-side screenshots, not assumed.
+
+## Celestial wallpaper pack and gallery — Issue #9 refinement
+
+The four user-selected wallpapers are distributed as a downloadable `NEO-OS_Celestial_Wallpapers_v0.3.zip` attachment in the project's ChatGPT conversation. **They are not included as binary GitHub assets in this branch**; Qt must find them in the local wallpaper data directory.
+
+1. Save and extract the wallpaper ZIP on your Ubuntu machine. If saved under `$HOME/Downloads`, run:
+   ```bash
+   mkdir -p "$HOME/Downloads/neo-wallpapers"
+   unzip "$HOME/Downloads/NEO-OS_Celestial_Wallpapers_v0.3.zip" -d "$HOME/Downloads/neo-wallpapers"
+   bash desktop/shell/install-wallpapers.sh "$HOME/Downloads/neo-wallpapers/wallpapers"
+   ```
+2. Restart NEO Desktop. It discovers image files from `${XDG_DATA_HOME:-$HOME/.local/share}/neo-os/wallpapers`. The first named wallpaper (`01-ringed-moon-citadel.webp`) is the default if no valid previously selected path is saved.
+3. Open **Settings**. Select any thumbnail in the wallpaper gallery, adjust the **Wallpaper contrast** slider, or choose **Cyan / Violet**. These settings persist through QSettings.
+4. Verify wallpaper rendering, correct image crop, label readability and no visual collision in a real screenshot. If the ZIP is unavailable, manually place clean PNG/JPG/WebP images in the same data directory using the installer. The generated Canvas fallback still works with zero external assets.
+
+The installer copies images into the current user's XDG data directory with no `sudo`; it deliberately refuses symlinks and only accepts simple image file names. It is not an image parser or full security audit. Never execute downloaded scripts unrelated to the repository.
