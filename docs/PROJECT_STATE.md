@@ -21,9 +21,9 @@ Updated: 2026-11-16
 ### Evidence
 - GitHub contents verified for all six files.
 - Simple read-only source/string inspection checks passed (presence of Qt module, QML path, dock data, pin persistence and Gio launcher).
-- **CMake/Qt compile: NOT RUN**. The assistant environment does not have Qt 6 development packages installed.
+- **CMake/Qt compile: USER-REPORTED PASS** on Ubuntu 24.04 (CMake 3.28.3, Ninja 1.11.1, GCC 13.3.0), `[18/18] Linking CXX executable neo-desktop`. The assistant has not independently reproduced the build.
 - **GitHub Actions result: NOT VERIFIED**. Workflow was committed but no passing run is established.
-- **Interactive UI, real application launch and Matrix terminal: NOT TESTED**.
+- **Interactive UI: USER-REPORTED STARTUP FAILURE**: `qrc:/qt/qml/NeoDesktop/Main.qml: No such file or directory`. Current remote CMake has `RESOURCE_PREFIX "/qt/qml"`; user needs `git pull --ff-only` and clean rebuild. Real app launch and Matrix terminal not tested.
 - No source was installed as the host shell or as NEO-OS.
 
 ## Not yet verified
@@ -33,7 +33,7 @@ Updated: 2026-11-16
 - Host hardware/virtualization inventory and ADR approvals.
 
 ## Next work
-1. Obtain CI compile result and fix any CMake/C++/QML errors.
+1. User: pull current master (which has explicit QML resource prefix), rebuild in clean build directory, launch and report console output; resolve any further QML runtime errors. CI result still unverified.
 2. Run the desktop preview on a supported Linux host; record screenshots, app launch, pin persistence and terminal behavior.
 3. Replace placeholder icons with theme-aware app icons; add keyboard access, focus handling, and real active-window indicators where permitted.
 4. Validate host hardware and begin isolated LFS build.
