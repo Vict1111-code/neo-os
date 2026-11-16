@@ -9,7 +9,30 @@
 #include <QProcess>
 #include <QVariantMap>
 #include <QDebug>
+#include <QIcon>
+#include <QQuickImageProvider>
+#include <QPixmap>
+#include <QHash>
 #include <algorithm>
+
+class AppIconProvider final : public QQuickImageProvider {
+public:
+    explicit AppIconProvider(const QHash<QString, QString> *icons)
+        : QQuickImageProvider(QQuickImageProvider::Pixmap), icons_(icons) {}
+
+    QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) override {
+        const QSize target = requestedSize.isValid() ? requestedSize : QSize(64, 64);
+        const QString iconName = icons_->value(id, QStringLiteral("application-x-executable"));
+        QIcon icon = QIcon::fromTheme(iconName);
+        if (icon.isNull())
+            icon = QIcon::fromTheme(QStringLiteral("application-x-executable"));
+        QPixmap pixmap = icon.pixmap(target);
+        if (size) *size = pixmap.size();
+        return pixmap;
+    }
+private:
+    const QHash<QString, QString> *icons_;
+};
 
 class DesktopBackend : public QObject {
     Q_OBJECT
@@ -32,9 +55,11 @@ public:
                 }
                 const QString id = QFileInfo(path).fileName();
                 const QString name = desktop.value("Name").toString().trimmed();
+                const QString iconName = desktop.value("Icon").toString().trimmed();
                 desktop.endGroup();
                 if (id.isEmpty() || name.isEmpty() || appPaths.contains(id)) continue;
                 appPaths.insert(id, path); appNames.insert(id, name);
+                appIcons.insert(id, iconName.isEmpty() ? QStringLiteral("application-x-executable") : iconName);
             }
         }
         QStringList ids = appPaths.keys();
@@ -56,9 +81,10 @@ public:
     }
     QStringList pinnedApps() const { return pins; }
     QVariantList availableApps() const { return apps; }
+    const QHash<QString, QString> *icons() const { return &appIcons; }
     Q_INVOKABLE QVariantMap appById(const QString &id) const {
         if (!appPaths.contains(id)) return {};
-        return {{"id", id}, {"name", appNames.value(id)}};
+        return {{"id", id}, {"name", appNames.value(id)}, {"icon", appIcons.value(id)}};
     }
     Q_INVOKABLE bool launch(const QString &id) {
         // Only enumerate installed .desktop entries; never execute untrusted text from the UI.
@@ -93,7 +119,7 @@ private:
         settings.setValue("dock/pins", pins);
         settings.sync();
     }
-    QHash<QString, QString> appPaths, appNames;
+    QHash<QString, QString> appPaths, appNames, appIcons;
     QVariantList apps;
     QStringList pins;
 };
@@ -104,6 +130,7 @@ int main(int argc, char *argv[]) {
     app.setOrganizationName("NEO-OS");
     DesktopBackend backend;
     QQmlApplicationEngine engine;
+    engine.addImageProvider("appicons", new AppIconProvider(backend.icons()));
     engine.rootContext()->setContextProperty("backend", &backend);
     engine.load(QUrl("qrc:/qt/qml/NeoDesktop/Main.qml"));
     if (engine.rootObjects().isEmpty()) return 1;
