@@ -1,56 +1,62 @@
-# NEO Desktop — Qt/QML Proof of Concept
-**Phase:** 1 / Track A. **Status:** Source committed; compilation and runtime behavior not yet verified.
+# NEO Desktop — Native Qt/QML Preview (Iteration 0.2)
 
-This is a normal desktop *application*, not a replacement for your host desktop compositor or an installed operating system. It draws a classical-neon desktop concept, an expandable orbital launcher, a visible Matrix CLI action, and an installed-app pinning panel.
+**Status:** Source updated. The 0.1 preview was compiled and launched successfully on an Ubuntu 24.04 host (user-provided screenshot, 2026-11-16). **The 0.2 changes have not yet been compiled or tested on that host.**
 
-## Requirements
-- Linux with a graphical session (X11 or Wayland)
-- Qt 6.4+ with Qt Quick, Qt QML, Qt Quick Controls
-- CMake 3.21+, C++17 compiler, Ninja or Make
-- GIO command-line launcher (`gio`, commonly from GLib)
-- At least one terminal for Matrix CLI (`xterm`, `kitty`, `konsole`, `gnome-terminal`, or `xfce4-terminal`)
+This is a **normal Qt desktop application window**. It will not replace GNOME, change your login manager, install NEO-OS, or modify the Linux From Scratch base.
 
-Example setup on a supported Ubuntu/Debian release; package names may vary:
+## Setup (Ubuntu 24.04)
 ```bash
 sudo apt update
-sudo apt install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev \
+sudo apt install -y cmake ninja-build build-essential git \
+  qt6-base-dev qt6-declarative-dev libxkbcommon-dev \
+  qml6-module-qtqml-workerscript qml6-module-qtqml-models \
   qml6-module-qtquick qml6-module-qtquick-controls \
   qml6-module-qtquick-layouts qml6-module-qtquick-window \
   libglib2.0-bin xterm
 ```
 
-## Build and run
-From the repository root:
+## Update and run
+From a clean local checkout:
 ```bash
+cd ~/neo-os
+git status
+git pull --ff-only origin master
 cmake -S desktop/shell -B out/neo-desktop -G Ninja -DCMAKE_BUILD_TYPE=Debug
 cmake --build out/neo-desktop
 ./out/neo-desktop/neo-desktop
 ```
 
-This should open an application window, not replace your existing desktop session.
+If `git pull --ff-only` refuses because of local modifications, preserve those modifications rather than resetting or overwriting. If the GUI fails, run `./out/neo-desktop/neo-desktop 2>&1 | tee neo-desktop-runtime.log` and share the terminal output.
 
-## Interactions
-- Click the central ◈ button to expand/collapse the orbital dock.
-- Hover over dock icons to expand; left-click one to launch via `gio launch <installed.desktop>`.
-- Right-click a dock icon to unpin.
-- Open **Apps** in the left rail and pin a discovered installed application.
-- Select **Matrix CLI** to launch the first detected terminal. A themed xterm/kitty receives dark/green colors; some other terminals keep their default theme.
-- Toggle **Motion effects** in the control panel. Pins persist through `QSettings` under the current user.
+## New in this iteration
+- Real system application icons through Qt `QIcon` and `image://appicons` (fall back to initials where no icon exists).
+- Cleaner default desktop composition with subtle celestial rings and less visual clutter.
+- Expandable circular dock at bottom-right, with improved hover states and app labels.
+- Searchable installed-app listing with **Open** and **Pin** actions.
+- `QSettings` backed pinned application persistence from the existing C++ backend.
+- Matrix CLI action launches an installed terminal such as xterm or kitty.
+- Accessible names on buttons, with an initial reduced-motion toggle.
 
-## Important limitations
-- This is a prototype inside one window. It does **not** own global window management, running-app tracking, top-level wallpaper, system notifications, GPU dashboard, AI actions, package installation, or login/session switching.
-- The prototype does not yet draw desktop application icons from the freedesktop icon theme; it displays app initials.
-- Applications are discovered from installed `.desktop` entries. Those files are executable system instructions: only pin trusted installed applications. Listing filters are a convenience, not a sandbox or complete trust validation.
-- If `gio` or supported terminals are missing, actions return an explanatory message.
-- No source compilation or functional GUI test was possible in the current assistant environment because Qt 6 development libraries were unavailable. Tests must be executed on a properly equipped Linux host or CI.
+## Manual test plan
+1. The window starts after the Qt runtime modules are installed.
+2. Click center of orbit; icons reposition when expanded. Click again to collapse.
+3. Click the Chromium/Firefox icon (or another known trusted app). The installed application should launch.
+4. Open **Apps**, search for an installed app, click **Pin**, close and restart preview. Confirm pinned app persists.
+5. Right-click a pinned app icon to unpin; verify state persists after restart.
+6. Open Matrix CLI. Run `pwd` or `echo NEO-OS` inside the terminal.
+7. Disable motion effects and check that interface remains usable.
+8. Check window layout at smaller widths and note any clipping or QML errors.
 
-## Manual acceptance checklist
-- [ ] Builds on target Linux with Qt 6.
-- [ ] Opens preview without replacing/compressing current desktop session.
-- [ ] At least one .desktop launcher opens a real app.
-- [ ] Pin and unpin survives relaunch.
-- [ ] Keyboard controls and accessibility are evaluated (partially implemented).
-- [ ] Matrix CLI opens terminal and executes normal shell commands.
-- [ ] Motion toggle reduces animation; behavior checked.
-- [ ] Windows and screen scaling tested.
-Record commands/screenshots/errors in `docs/PROJECT_STATE.md`.
+## Current limitations and risks
+- Real running-window tracking, embedded PTY terminal, compositor/session integration, AI tools and OS-level functionality are **not** implemented.
+- Some desktop entries use unusual icon formats and may show a fallback letter. Qt's icon theme determines icon availability.
+- The Gio launcher executes installed `.desktop` entries, which should be trusted as system applications. It is not a sandbox.
+- Full keyboard navigation, focus behavior, screen-reader tests and launch status tracking remain outstanding.
+- CI and the 0.2 source build result are not yet verified. Do not treat source-level inspection as runtime testing.
+
+## Static source tests
+```bash
+python3 -m unittest discover -s tests -p 'test_desktop_source.py' -v
+```
+
+Record the observed results, warnings and screenshots in `docs/PROJECT_STATE.md`.
