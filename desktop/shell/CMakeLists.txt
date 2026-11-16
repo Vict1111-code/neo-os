@@ -5,12 +5,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 find_package(Qt6 6.4 REQUIRED COMPONENTS Quick Qml)
 qt_standard_project_setup()
-qt_add_executable(neo-desktop main.cpp)
+qt_add_executable(neo-desktop main.cpp MatrixPty.cpp MatrixPty.h)
 qt_add_qml_module(neo-desktop
   URI NeoDesktop
   VERSION 1.0
   RESOURCE_PREFIX "/qt/qml"
-  QML_FILES Main.qml
+  QML_FILES Main.qml MatrixTerminal.qml
 )
 target_link_libraries(neo-desktop PRIVATE Qt6::Quick Qt6::Qml)
+if(UNIX AND NOT APPLE)
+  target_link_libraries(neo-desktop PRIVATE util)
+endif()
 install(TARGETS neo-desktop RUNTIME DESTINATION bin)
