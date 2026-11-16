@@ -52,7 +52,7 @@ class DesktopSourceTests(unittest.TestCase):
     def test_interface_and_accessibility_hooks(self):
         qml = (SHELL / "Main.qml").read_text()
         for expected in ("backend.pinnedApps", "backend.availableApps",
-                         "backend.launch(appId)", "backend.launchMatrix()",
+                         "backend.launch(appId)", "matrixPty.start()",
                          "image://appicons/", "backend.pin(modelData.id)",
                          "reducedMotion", "root.dockExpanded",
                          'sequence: "Ctrl+Space"', 'sequence: "Ctrl+K"',
