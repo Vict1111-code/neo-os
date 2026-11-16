@@ -1,0 +1,38 @@
+name: NEO Desktop preview
+on:
+  push:
+    paths:
+      - 'desktop/shell/**'
+      - 'tests/test_desktop_source.py'
+      - '.github/workflows/desktop-preview.yml'
+  pull_request:
+    paths:
+      - 'desktop/shell/**'
+      - 'tests/test_desktop_source.py'
+      - '.github/workflows/desktop-preview.yml'
+jobs:
+  build-and-source-tests:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Static source tests
+        run: python3 -m unittest discover -s tests -p 'test_desktop_source.py' -v
+      - name: Install Qt build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev \
+            qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts \
+            qml6-module-qtquick-window libglib2.0-bin xterm
+      - name: Configure
+        run: cmake -S desktop/shell -B out/neo-desktop -G Ninja -DCMAKE_BUILD_TYPE=Debug
+      - name: Compile
+        run: cmake --build out/neo-desktop --parallel 2
+      - name: Upload compiled preview
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neo-desktop-linux-preview
+          path: out/neo-desktop/neo-desktop
+          if-no-files-found: error
