@@ -34,7 +34,7 @@ class DesktopSourceTests(unittest.TestCase):
         for expected in ("backend.pinnedApps", "backend.availableApps",
                          "backend.launch(appId)", "backend.launchMatrix()",
                          "image://appicons/", "backend.pin(modelData.id)",
-                         "reducedMotion", "orbit.expanded"):
+                         "reducedMotion", "root.dockExpanded"):
             with self.subTest(expected=expected):
                 self.assertIn(expected, qml)
 
