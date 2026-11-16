@@ -13,6 +13,7 @@
 #include <QQuickImageProvider>
 #include <QPixmap>
 #include <QHash>
+#include "MatrixPty.h"
 #include <algorithm>
 
 class AppIconProvider final : public QQuickImageProvider {
@@ -129,9 +130,11 @@ int main(int argc, char *argv[]) {
     app.setApplicationName("NEO Desktop Preview");
     app.setOrganizationName("NEO-OS");
     DesktopBackend backend;
+    MatrixPty matrixPty;
     QQmlApplicationEngine engine;
     engine.addImageProvider("appicons", new AppIconProvider(backend.icons()));
     engine.rootContext()->setContextProperty("backend", &backend);
+    engine.rootContext()->setContextProperty("matrixPty", &matrixPty);
     engine.load(QUrl("qrc:/qt/qml/NeoDesktop/Main.qml"));
     if (engine.rootObjects().isEmpty()) return 1;
     return app.exec();
