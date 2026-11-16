@@ -1,18 +1,18 @@
-# Architecture Decision Register
+# NEO-OS Architecture Decision Register
 
-The following are **proposed**, not accepted, ADRs:
+**Updated:** 2026-11-16. All records remain **PROPOSED**, not approved or implemented.
 
-| ADR | Topic | Status |
-|---|---|---|
-| 001 | LFS/BLFS systemd foundation | Proposed |
-| 002 | x86-64 first hardware target | Proposed |
-| 003 | Rust-first original native services | Proposed |
-| 004 | Qt/QML desktop on existing Wayland compositor | Proposed |
-| 005 | Authenticated local IPC and permission broker | Proposed |
-| 006 | Verified sources and reproducible package recipes | Proposed |
-| 007 | Package manager selection and metadata | Proposed |
-| 008 | Signed updates and tested recovery | Proposed |
-| 009 | AI inference isolated from privileged system actions | Proposed |
-| 010 | QEMU-first safe build and testing | Proposed |
+| ID | Subject | Status | Document |
+|---|---|---|---|
+| ADR-001 | LFS/BLFS systemd foundation | Proposed | [ADR](../ADR/ADR-001.md) |
+| ADR-002 | x86-64 first | Proposed | [ADR](../ADR/ADR-002.md) |
+| ADR-003 | Rust-first native services | Proposed | [ADR](../ADR/ADR-003.md) |
+| ADR-004 | Qt/QML + existing Wayland compositor | Proposed | [ADR](../ADR/ADR-004.md) |
+| ADR-005 | Authenticated IPC and permission broker | Proposed | [ADR](../ADR/ADR-005.md) |
+| ADR-006 | Verified source builds | Proposed | [ADR](../ADR/ADR-006.md) |
+| ADR-007 | Package backend evaluation | Proposed | [ADR](../ADR/ADR-007.md) |
+| ADR-008 | Signed updates and recovery | Proposed | [ADR](../ADR/ADR-008.md) |
+| ADR-009 | Privilege-separated AI | Proposed | [ADR](../ADR/ADR-009.md) |
+| ADR-010 | QEMU-first safe testing | Proposed | [ADR](../ADR/ADR-010.md) |
 
-Each ADR requires context, alternatives, consequences and validation evidence before acceptance.
+Each record must be reviewed, validation criteria established, and accepted explicitly before being treated as architectural policy. The target architecture is described in [ARCHITECTURE.md](../ARCHITECTURE.md).
