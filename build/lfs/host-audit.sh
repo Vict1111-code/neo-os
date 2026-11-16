@@ -52,7 +52,7 @@ printf 'No disk partitioning or filesystem changes are performed.\n'
 
 section "Build tools (presence only)"
 # Versions and compatibility must be assessed against the exact LFS book!
-for tool in bash as ld bison bzip2 chown coreutils diff find gawk gcc g++ grep gzip m4 make patch perl python3 sed tar texi2any xz; do
+for tool in bash as ld bison bzip2 chown cp diff find gawk gcc g++ grep gzip m4 make patch perl python3 sed tar texi2any xz; do
   readout "$tool" "$tool"
 done
 printf '\nAdditional useful tools:\n'
