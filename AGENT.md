@@ -73,3 +73,9 @@ Do not automatically schedule all P1–P3 features into the first milestone.
 
 ## Current verified project status
 **No source implementation, LFS build, OS boot, hardware test, or CI execution is verified by this agent-file package.** Phase 0 remains an evidence-gathering and design-approval gate. The PRD and roadmap are prepared separately as planning documents. See `docs/PROJECT_STATE.md`.
+## Required GitHub delivery lifecycle and teaching handoff
+Every repository change, including documentation, must follow **Issue → feature branch → commits → pull request → review/checks → merge → issue closure**. Do not commit directly to `master` in normal development. Exceptions (e.g. production emergency) require a documented issue and follow-up PR; never bypass repository protection or falsely claim checks passed. Link PRs to issues using `Closes #N` when appropriate; merge only after relevant tests and review evidence are established. If CI or an independent reviewer is unavailable, disclose that clearly and keep the PR open for review rather than asserting approval. Close issues only after validated acceptance criteria are met.
+
+After every implementation, give the user a **substantive engineering lesson**: why the change was needed; relevant OS, C++, Qt/QML, Rust, Linux or Git concepts; precise files/functions changed; how data/control flows; security/trade-offs; commands to reproduce; test evidence and limits; and 1–3 short comprehension questions or hands-on exercises. Explain new terminology progressively, relate learning to actual changed code, and invite the user to demonstrate understanding. Do not confuse explanation with test evidence.
+
+Pull request descriptions must include issue, scope, tests, screenshots/logs if relevant, risks, rollback, and a teaching section. Update `docs/PROJECT_STATE.md` and applicable `AGENT.md` as part of the same PR. See `docs/agent/WORKFLOW.md`.
