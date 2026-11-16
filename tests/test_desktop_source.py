@@ -8,7 +8,8 @@ SHELL = ROOT / "desktop" / "shell"
 
 class DesktopSourceTests(unittest.TestCase):
     def test_required_files_present(self):
-        for name in ("CMakeLists.txt", "main.cpp", "Main.qml", "README.md"):
+        for name in ("CMakeLists.txt", "main.cpp", "Main.qml", "README.md",
+                     "MatrixPty.h", "MatrixPty.cpp", "MatrixTerminal.qml"):
             with self.subTest(name=name):
                 self.assertTrue((SHELL / name).is_file())
 
@@ -21,6 +22,25 @@ class DesktopSourceTests(unittest.TestCase):
         self.assertIn("AppIconProvider", cpp)
         self.assertIn('engine.addImageProvider("appicons"', cpp)
         self.assertIn("QProcess::startDetached", cpp)
+
+    def test_matrix_pty_prototype_contract(self):
+        cmake = (SHELL / "CMakeLists.txt").read_text()
+        cpp = (SHELL / "MatrixPty.cpp").read_text()
+        header = (SHELL / "MatrixPty.h").read_text()
+        qml = (SHELL / "MatrixTerminal.qml").read_text()
+        root_qml = (SHELL / "Main.qml").read_text()
+        for token in ("forkpty(", "QSocketNotifier", "waitpid(", "sendLine(",
+                      "interrupt()", "stop()", "TERM", "dumb"):
+            with self.subTest(token=token):
+                self.assertIn(token, cpp)
+        self.assertIn("Q_PROPERTY(bool running", header)
+        self.assertIn("MatrixPty.cpp", cmake)
+        self.assertIn("MatrixTerminal.qml", cmake)
+        self.assertIn("target_link_libraries(neo-desktop PRIVATE util)", cmake)
+        self.assertIn("matrixPty.sendLine", qml)
+        self.assertIn("matrixPty.interrupt()", qml)
+        self.assertIn("matrixPty.stop()", qml)
+        self.assertIn("MatrixTerminal {", root_qml)
 
     def test_launcher_avoids_shell_interpolation(self):
         cpp = (SHELL / "main.cpp").read_text()
