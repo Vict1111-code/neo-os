@@ -134,3 +134,12 @@ These results are self-reported manual tests, not independent automated PTY life
 - GitHub Actions run #43945489673 completed successfully for commit `ae7314b`, including live PTY integration smoke test, source tests, Qt build and artifact upload.
 - A targeted earlier background PID test passed. Detached descendant cleanup and full terminal emulation remain limitations.
 - **Independent PR review not yet recorded**. Keep PR #6 open pending required review; do not misrepresent generic "working fine" as full formal approval.
+
+## Issue #9 — Celestial Desktop visual refinement (stacked PR, 2026-11-16)
+- Reference: user-provided futuristic classical-fantasy NEO-OS screenshots, newest showing workspace bar, left rail, glowing planetary/castle backdrop, central orbital launcher, AI/store/device/status glass cards and bottom dock.
+- On `feat/9-celestial-desktop-refinement`, rewrote `Main.qml` with glass UI composition, center orbit, bottom pinned dock, preview-only widgets, generated celestial Canvas fallback and persistent local-image wallpaper selection.
+- C++ `DesktopBackend` now persists a verified local readable wallpaper URL and cyan/violet accent choice via QSettings.
+- Existing real installed app enumeration, icon provider, launches and pin persistence are preserved, as is experimental embedded Matrix CLI from underlying PR #6.
+- **Do not misrepresent** visual-only services (AI, app market, devices, workspaces, telemetry) as actually integrated; they are clearly labeled previews.
+- **Validation pending**: CI build/QML parsing, live Ubuntu side-by-side screenshots, wallpaper persistence, 1024×640 responsiveness, keyboard/Matrix regression and independent PR review.
+- This is a **stacked** branch/PR over unmerged PR #6. Need PR #6 merged first, then retarget this change to master and rerun CI before merge.
