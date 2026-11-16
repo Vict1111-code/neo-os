@@ -23,7 +23,7 @@ public:
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) override {
         const QSize target = requestedSize.isValid() ? requestedSize : QSize(64, 64);
         const QString iconName = icons_->value(id, QStringLiteral("application-x-executable"));
-        QIcon icon = QIcon::fromTheme(iconName);
+        QIcon icon = QFileInfo(iconName).isAbsolute() ? QIcon(iconName) : QIcon::fromTheme(iconName);
         if (icon.isNull())
             icon = QIcon::fromTheme(QStringLiteral("application-x-executable"));
         QPixmap pixmap = icon.pixmap(target);
