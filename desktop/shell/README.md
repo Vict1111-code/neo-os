@@ -113,3 +113,38 @@ ctest --test-dir out/neo-desktop --output-on-failure
 ./out/neo-desktop/neo-desktop
 ```
 Use `git status` before switching if there may be uncommitted changes. Verify Ctrl+C, Stop/Start and a foreground `sleep` again; don't run destructive commands. Update test results on PR #6.
+
+## Celestial visual refinement — Issue #9 (stacked on PR #6)
+
+This branch implements a Qt/QML **reference-inspired** layout using a top workspace bar, glass sidebar and cards, generated celestial wallpaper fallback, center orbital launcher with actual pinned Linux apps, and an additional bottom pinned-app dock. Wallpaper URL and cyan/violet accent choice persist in QSettings. **The uploaded reference compositions are not embedded assets**; they include example interface elements, not clean wallpaper source images. To approach their scenery, select an actual background image from your own local collection.
+
+### Build this stacked branch safely
+```bash
+cd ~/neo-os
+git status
+git fetch origin
+git switch -c feat/9-celestial-desktop-refinement --track origin/feat/9-celestial-desktop-refinement
+cmake -S desktop/shell -B out/neo-desktop -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake --build out/neo-desktop
+ctest --test-dir out/neo-desktop --output-on-failure
+./out/neo-desktop/neo-desktop
+```
+Use `git switch feat/9-celestial-desktop-refinement` if it already exists. Preserve local modifications.
+
+### Wallpaper / theme setup
+1. Open **Settings** on the left rail or gear button in the top bar.
+2. Enter the absolute path to a readable JPG, PNG or WebP image on your Ubuntu host (ideally the clean planet/castle background without interface overlays) and click **Apply wallpaper**.
+3. Use **Cyan** or **Violet** to switch neon accents. Appearance survives restarts through local QSettings.
+4. Use **Use celestial fallback** for the built-in, canvas-generated planet/starfield when no image is configured.
+
+No cloud image download or background networking is performed. A removed/unreadable saved image reverts to the fallback.
+
+### UI acceptance checklist
+- Check at both 1360×820 and 1024×640 (within minimum 980×640): top bar, navigation, orbit and cards stay visible. Overlap/clipping is a known risk at smaller sizes; report exact screenshots.
+- Test Ctrl+K app search, Ctrl+Space dock expand/collapse, Escape dismissal, click/keyboard accessibility, real apps and pinned-app persistence.
+- Test embedded Matrix CLI still executes `pwd` and `echo NEO-OS` and Ctrl+C, Stop/Start; this branch is stacked on PR #6.
+- Test wallpaper persistence and both accent selections after restart.
+- Confirm AI assistant, device sync, live system telemetry, universal store and workspaces are **explicitly preview-only**. They are not implemented as functional system services.
+- Record CPU performance impact and preference for reduced motion. No animation should be required to operate core controls.
+
+This is **a regular Ubuntu window**, not yet an installed NEO-OS shell/compositor. Visual reference fidelity is iterative and must be verified by side-by-side screenshots, not assumed.
