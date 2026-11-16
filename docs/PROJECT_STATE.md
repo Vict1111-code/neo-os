@@ -91,3 +91,10 @@ Every next milestone must record actual tests, warnings, changed paths, branch/c
 - Updated static source-contract checks and Ubuntu manual test instructions.
 - **Status: source only. Qt compilation, runtime shell commands, PTY lifecycle and regression tests not yet verified.** Do not treat these as a completed Matrix CLI.
 - Next: submit PR for CI and user manual tests, fix failures; evaluate maintained full terminal widget before production integration.
+
+### Embedded PTY Ubuntu runtime screenshot evidence — 2026-11-16 19:29
+- User supplied a screenshot showing **Matrix CLI • Linux PTY preview** embedded within the NEO Desktop window on Ubuntu.
+- In-panel command/output pairs are visible: `pwd` → `/home/admin/neo-os`; `echo NEO-OS` → `NEO-OS`; `whoami` → `admin`; `uname -s` → `Linux`. The prompt returns following each command. These establish basic line-oriented shell input/output on the user's Linux host.
+- GitHub Actions run #43931939690 passed static tests, Qt configure/compile, and artifact upload; no independent GitHub PR review is recorded.
+- **Still unverified:** Ctrl+C interrupting `sleep 20`, Stop/Start behavior, shell process cleanup, close/reopen, and dock regressions on this feature branch. Screenshot alone cannot establish these.
+- **Decision:** PR #6 and Issue #5 remain open until the remaining acceptance tests are evidenced and reviewed. The panel remains a prototype, not a complete VT terminal emulator.
