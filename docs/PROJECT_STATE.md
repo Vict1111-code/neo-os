@@ -63,3 +63,9 @@ Every next milestone must record actual tests, warnings, changed paths, branch/c
 - Proposed process: tracked GitHub issues, isolated branches, PRs, review/checks, merge and issue closure for every change; explain and teach every implementation.
 - See `docs/agent/WORKFLOW.md` for the exact lifecycle and required learning handoff.
 - This policy is documentation/governance only; it does not establish GUI 0.2 runtime verification or LFS boot success.
+
+## Issue #3 — Keyboard interaction hardening (PR pending)
+- Feature branch `feat/3-keyboard-orbital-dock` changes the Qt/QML UI to support Ctrl+Space (dock), Ctrl+K (app search) and Escape (dismiss), plus dock-center focus styling.
+- CI Ubuntu package list and Python static source checks updated; docs and agent handoff included.
+- **Build/CI/manual tests: NOT VERIFIED for this branch.** Source edits alone do not prove keyboard behavior.
+- Next: review PR, inspect CI; run application locally and report focus/keyboard behavior before accepting/merging.
