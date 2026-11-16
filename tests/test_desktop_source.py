@@ -18,6 +18,8 @@ class DesktopSourceTests(unittest.TestCase):
         self.assertIn("qt_add_qml_module", cmake)
         self.assertIn("Q_PROPERTY(QStringList pinnedApps", cpp)
         self.assertIn("QSettings", cpp)
+        self.assertIn("AppIconProvider", cpp)
+        self.assertIn('engine.addImageProvider("appicons"', cpp)
         self.assertIn("QProcess::startDetached", cpp)
 
     def test_launcher_avoids_shell_interpolation(self):
@@ -30,7 +32,8 @@ class DesktopSourceTests(unittest.TestCase):
     def test_interface_and_accessibility_hooks(self):
         qml = (SHELL / "Main.qml").read_text()
         for expected in ("backend.pinnedApps", "backend.availableApps",
-                         "backend.launch(modelData)", "backend.launchMatrix()",
+                         "backend.launch(appId)", "backend.launchMatrix()",
+                         "image://appicons/", "backend.pin(modelData.id)",
                          "reducedMotion", "orbit.expanded"):
             with self.subTest(expected=expected):
                 self.assertIn(expected, qml)
