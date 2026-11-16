@@ -49,13 +49,16 @@ class DesktopSourceTests(unittest.TestCase):
             "Canvas {", "createRadialGradient", "source: backend.wallpaperUrl",
             "backend.setWallpaperPath(", "backend.setAccentTheme(",
             "backend.pinnedApps", "backend.availableApps",
+            "backend.wallpaperThemes", "backend.wallpaperDim",
+            "backend.setWallpaperDim(",
             "NEO AI ASSISTANT", "SYSTEM STATUS", "NEO MARKET",
             "DEVICES & SYNC", "Ctrl+Space", "Ctrl+K",
             "not connected", "not implemented", "root.reducedMotion"
         ):
             with self.subTest(token=token):
                 self.assertIn(token, qml)
-        for token in ("QImageReader(path).canRead()", "appearance/wallpaper",
+        for token in ("QImageReader(path).canRead()", "wallpaperThemes READ wallpaperThemes",
+                      "QStandardPaths::GenericDataLocation", "appearance/dim", "appearance/wallpaper",
                       "appearance/accent", "wallpaperUrlChanged()",
                       "accentThemeChanged()"):
             with self.subTest(token=token):
