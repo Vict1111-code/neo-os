@@ -203,3 +203,9 @@ These results are self-reported manual tests, not independent automated PTY life
 - Visible deficiency: dark nearly flat-looking sphere, black solid cylinder pedestal, missing reference-level reflections/refraction, bloom and glass texture. UI and wallpaper remained visible. App click/keyboard behavior was not explicitly retested in this message.
 - Material revision: actual 3D opaque illuminated core plus translucent shell, increased lighting intensity, five pedestal layers including emissive cyan rim and themed inner ring. Added regression assertions and documented gap vs full reference. **Updated Ubuntu screenshot and CI are pending**.
 - PR #12 remains open and stacked on PR #10 (based on #6); do not merge before dependencies/review and actual UI acceptance.
+
+## Issue #11 — Ubuntu 16:44 visual correction (2026-11-17)
+- The user supplied another real Ubuntu GPU screenshot after the brighter-material pass: the sphere now rendered as an **overbright, opaque pastel cyan/pink ball**, while the five-layer pedestal appeared unnaturally luminous. The reference instead shows dark translucent-looking navy glass, coherent rim highlights and detailed metallic lighting.
+- Adjusted sphere core from bright diffuse blue to **deep navy/violet**, substantially reduced direct light and emissive intensities, kept a weak specular outer shell, and reduced pedestal luminosity. Added subtle edge-glint Canvas to suggest glass without claiming physical refraction.
+- Added source regression checks for the updated material palette and edge details. **This exact revision has not yet been visually verified on the user's GPU**; do not claim reference parity or solved rendering. Continue toward HDR/reflection probe, real shader material, bloom and depth-correct ring geometry with performance measurements.
+- PR #12 remains stacked on PR #10 and PR #6 and awaits CI, runtime acceptance and review.
