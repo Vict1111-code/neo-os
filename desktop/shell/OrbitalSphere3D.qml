@@ -59,7 +59,6 @@ Item {
                     roughness: 0.11
                     specularAmount: 1.0
                     alphaMode: PrincipledMaterial.Blend
-                    depthDrawMode: Material.OpaqueOnlyDepthDraw
                 }
             }
             NumberAnimation on eulerRotation.y {
