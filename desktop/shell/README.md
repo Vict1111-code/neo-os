@@ -220,3 +220,11 @@ The reference-highlighted spherical launcher is now a functional Qt/QML componen
 - These are 2D QML effects (several translucent circles and gradients). They are intentionally lightweight for midrange hardware and do not require Qt Quick 3D or Linux From Scratch.
 
 **Manual Ubuntu acceptance:** take screenshot at full size and at 1024×640; check orbit does not cover right cards, sidebar, or bottom dock. Verify all icons launch, keyboard Tab+Enter, right-click unpin and persistence, Ctrl+Space, wallpaper, Matrix CLI, and reduced motion. Note: screenshot fidelity to the original visual concept is still under review.
+
+## Glass-orbit rendering pass — 2026-11-17
+
+The user requested the **3D-like refractive sphere, luminous elliptical waves and curved metallic pedestal** visible in the cropped reference—not more flat concentric Rectangle objects. We replaced the orbit backdrop with `OrbitalGlassScene.qml`, a separate 2.5D Qt Canvas renderer painting a volumetric radial-gradient sphere, rim speculars, projected elliptical light bands, energy rings, and a layered metallic pedestal. `OrbitalGlassBubble.qml` paints glossy app spheres while **real installed Linux icons, launch buttons, right-click unpin and keyboard focus remain independent**.
+
+This is an intentional compositing layer, not a true geometric 3D model, per-pixel backdrop refraction, framebuffer blur or physically based renderer. **Exact parity with photoreal reference art is not yet established.** A shader-based implementation with Qt 6 RHI/Qt Quick 3D may be required for per-pixel normals, blur, textured transparency and realtime volumetric lighting. Prefer reviewing Ubuntu screenshots first before adding GPU complexity.
+
+Manual test: open the orbital launcher, check the glass globe appears behind eight (or however many are pinned) app spheres, compare pedestal and curved bands against reference, press Tab/Enter to launch, right-click to unpin, Ctrl+Space to expand, and verify low-motion behavior. Test at full and compact window sizes and check for Canvas redraw errors in the terminal log.
