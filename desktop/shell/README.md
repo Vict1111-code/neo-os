@@ -228,3 +228,22 @@ The user requested the **3D-like refractive sphere, luminous elliptical waves an
 This is an intentional compositing layer, not a true geometric 3D model, per-pixel backdrop refraction, framebuffer blur or physically based renderer. **Exact parity with photoreal reference art is not yet established.** A shader-based implementation with Qt 6 RHI/Qt Quick 3D may be required for per-pixel normals, blur, textured transparency and realtime volumetric lighting. Prefer reviewing Ubuntu screenshots first before adding GPU complexity.
 
 Manual test: open the orbital launcher, check the glass globe appears behind eight (or however many are pinned) app spheres, compare pedestal and curved bands against reference, press Tab/Enter to launch, right-click to unpin, Ctrl+Space to expand, and verify low-motion behavior. Test at full and compact window sizes and check for Canvas redraw errors in the terminal log.
+
+## Issue #11 — Experimental Qt Quick 3D glass sphere spike (2026-11-17)
+
+Screenshot review of the 2.5D orbit shows basic curves and light trails work, but physically shaped reflective materials are still missing. This stacked experimental branch adds `OrbitalSphere3D.qml` with **genuine 3D sphere mesh and perspective camera**, two real lights, PrincipledMaterial shading, and a modeled pedestal, while the orbital trails and clickable app bubbles remain QML overlays. It is a feasibility spike, **not** an exact photoreal reproduction or physically accurate glass refraction.
+
+### Ubuntu prerequisites
+```bash
+sudo apt install qt6-quick3d-dev qml6-module-quick3d
+```
+This package spelling is for Ubuntu 24.04. Run this only if you accept adding Qt developer/runtime packages on your existing Ubuntu machine. LFS is not required to run Qt Quick 3D.
+
+Open **Settings → Use experimental 3D orbital sphere** to switch between the GPU 3D attempt and retained procedural 2.5D fallback. A missing Qt Quick 3D module should leave the 2.5D renderer available. This mode is currently opt-in/on for normal desktop launches; offscreen software CI smoke disables the 3D Loader to protect its graphics-independent test. User GPU compatibility is **not established**.
+
+### Test after CI
+- Confirm 3D sphere is visible and responsive at the real Ubuntu display resolution, and contrast it with the fallback using the checkbox.
+- Test changing cyan/violet, Reduce Animations, Ctrl+Space, Tab+Enter application launch, right-click unpin, wallpaper/file picker, Matrix CLI.
+- Test 1024×640 and a full-size screenshot; record GPU/CPU performance and graphical warnings.
+- If QML reports `module QtQuick3D is not installed`, verify the Ubuntu package; if it renders black, report graphics backend and Qt warnings.
+- Shaders/texture maps, bloom pipeline, proper refraction, fully modeled orbit bands and platform detail remain future steps. Do **not** advertise exact matching before the screenshots demonstrate it.
