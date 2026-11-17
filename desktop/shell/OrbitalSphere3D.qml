@@ -134,6 +134,49 @@ Item {
         }
     }
 
+    // Low-opacity rim glints sell the silhouette without turning the opaque
+    // core into a bright pastel disc. These are a deliberate 2D approximation,
+    // NOT real environment reflection or optical refraction.
+    Canvas {
+        id: glassRim
+        anchors.fill: parent
+        renderTarget: Canvas.Image
+        onWidthChanged: requestPaint()
+        onHeightChanged: requestPaint()
+        onVioletChanged: requestPaint()
+        property bool violet: scene.violet
+        onPaint: {
+            const ctx = getContext("2d")
+            ctx.clearRect(0, 0, width, height)
+            const cx = width / 2, cy = height / 2
+            const r = Math.min(width, height) * 0.355
+            ctx.lineCap = "round"
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath()
+                ctx.arc(cx, cy, r + i * 1.9, 3.35, 5.27)
+                ctx.strokeStyle = i === 0 ? "rgba(196,251,255,0.55)" :
+                                  "rgba(58,177,255,0.13)"
+                ctx.lineWidth = i === 0 ? 2.6 : 4.5
+                ctx.stroke()
+            }
+            ctx.beginPath()
+            ctx.arc(cx, cy, r - 1.6, 0.26, 1.75)
+            ctx.strokeStyle = violet ? "rgba(253,129,251,0.36)" :
+                                       "rgba(70,226,252,0.35)"
+            ctx.lineWidth = 4
+            ctx.stroke()
+            const glintX = cx - r * 0.62, glintY = cy - r * 0.78
+            const glow = ctx.createRadialGradient(glintX, glintY, 0,
+                                                   glintX, glintY, r * 0.27)
+            glow.addColorStop(0, "rgba(200,247,255,0.28)")
+            glow.addColorStop(1, "rgba(115,205,255,0)")
+            ctx.fillStyle = glow
+            ctx.beginPath()
+            ctx.arc(glintX, glintY, r * 0.27, 0, 2 * Math.PI)
+            ctx.fill()
+        }
+    }
+
     // 2D emissive paths over the true 3D sphere; ray-traced refraction and
     // depth-correct ring occlusion are not implemented in this first spike.
     Canvas {
