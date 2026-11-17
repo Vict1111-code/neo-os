@@ -20,6 +20,7 @@
 #include <QRadialGradient>
 #include <QRandomGenerator>
 #include <QTemporaryDir>
+#include <QTimer>
 #include <QDir>
 #include <QFile>
 #include <QCryptographicHash>
@@ -375,6 +376,9 @@ int main(int argc, char *argv[]) {
     engine.rootContext()->setContextProperty("matrixPty", &matrixPty);
     engine.load(QUrl("qrc:/qt/qml/NeoDesktop/Main.qml"));
     if (engine.rootObjects().isEmpty()) return 1;
+    if (QCoreApplication::arguments().contains("--desktop-smoke-test")) {
+        QTimer::singleShot(800, &app, &QCoreApplication::quit);
+    }
     return app.exec();
 }
 #include "main.moc"
