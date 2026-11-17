@@ -75,3 +75,9 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - New files must be included in `qt_add_qml_module` in CMake; control semantics and app IDs must remain in `Main.qml`.
 - Do not call Canvas effects genuine 3D or real desktop blur. Shader/Quick3D renderer will be a distinct scoped feature if visual acceptance still falls short.
 - CI + Ubuntu runtime screenshot, QML console warnings, performance, keyboard, app-pinning and small-window validations are required before merge.
+
+## Issue #11 — Qt Quick 3D feasibility spike
+- This **stacked** feature branch `feat/11-quick3d-orbital-sphere` is based on PR #10's `feat/9-celestial-desktop-refinement`, which itself depends on Matrix PR #6.
+- `OrbitalSphere3D.qml` uses actual 3D primitives and lights, but 2D orbital trails and bubbles are still overlays. The user wants true material depth, backdrop blur/refraction and polished pedestal; these are **not** delivered yet.
+- `Main.qml` contains a Loader for the new scene plus the existing `OrbitalGlassScene` fallback. Preserve real Linux app launch actions/accessibility and make reduced-motion propagation work.
+- CI installs Ubuntu Quick 3D dependencies and runs existing software-rendering smoke with 3D intentionally disabled; a hardware-accelerated Ubuntu run is required for acceptance.
