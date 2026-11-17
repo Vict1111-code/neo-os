@@ -15,6 +15,8 @@
 #include <QHash>
 #include <QImageReader>
 #include <QDir>
+#include <QFile>
+#include <QCryptographicHash>
 #include <QUrl>
 #include "MatrixPty.h"
 #include <algorithm>
@@ -43,7 +45,7 @@ class DesktopBackend : public QObject {
     Q_PROPERTY(QStringList pinnedApps READ pinnedApps NOTIFY pinnedAppsChanged)
     Q_PROPERTY(QVariantList availableApps READ availableApps CONSTANT)
     Q_PROPERTY(QString wallpaperUrl READ wallpaperUrl NOTIFY wallpaperUrlChanged)
-    Q_PROPERTY(QVariantList wallpaperThemes READ wallpaperThemes CONSTANT)
+    Q_PROPERTY(QVariantList wallpaperThemes READ wallpaperThemes NOTIFY wallpaperThemesChanged)
     Q_PROPERTY(double wallpaperDim READ wallpaperDim NOTIFY wallpaperDimChanged)
     Q_PROPERTY(QString accentTheme READ accentTheme NOTIFY accentThemeChanged)
 public:
@@ -80,17 +82,7 @@ public:
         accent_ = settings.value("appearance/accent", "cyan").toString();
         if (accent_ != "cyan" && accent_ != "violet") accent_ = "cyan";
         wallpaperDim_ = qBound(0.0, settings.value("appearance/dim", 0.22).toDouble(), 0.72);
-        const QString wallpaperDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)
-                                    + "/neo-os/wallpapers";
-        QDir dir(wallpaperDir);
-        const QFileInfoList images = dir.entryInfoList({"*.webp", "*.png", "*.jpg", "*.jpeg"},
-                                       QDir::Files | QDir::Readable, QDir::Name);
-        for (const QFileInfo &image : images) {
-            if (!QImageReader(image.absoluteFilePath()).canRead()) continue;
-            const QString url = QUrl::fromLocalFile(image.absoluteFilePath()).toString();
-            themes_.append(QVariantMap{{"name", image.completeBaseName().replace('-', ' ')},
-                                       {"url", url}});
-        }
+        refreshWallpapers();
         const QString oldWallpaper = settings.value("appearance/wallpaper").toString();
         if (!oldWallpaper.isEmpty()) {
             const QString local = QUrl(oldWallpaper).toLocalFile();
@@ -111,6 +103,48 @@ public:
     }
     QString wallpaperUrl() const { return wallpaper_; }
     QVariantList wallpaperThemes() const { return themes_; }
+    Q_INVOKABLE void refreshWallpapers() {
+        const QString directory = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)
+                                  + "/neo-os/wallpapers";
+        QDir dir(directory);
+        QVariantList found;
+        const QFileInfoList images = dir.entryInfoList({"*.webp", "*.png", "*.jpg", "*.jpeg"},
+                                      QDir::Files | QDir::Readable | QDir::NoSymLinks, QDir::Name);
+        for (const QFileInfo &image : images) {
+            if (!QImageReader(image.absoluteFilePath()).canRead()) continue;
+            found.append(QVariantMap{{"name", image.completeBaseName().replace('-', ' ')},
+                                    {"url", QUrl::fromLocalFile(image.absoluteFilePath()).toString()}});
+        }
+        if (themes_ != found) {
+            themes_ = found;
+            emit wallpaperThemesChanged();
+        }
+    }
+    Q_INVOKABLE bool importWallpaper(const QString &source) {
+        // A user-selected local image is copied into the app's private wallpaper gallery.
+        const QString path = source.startsWith("file:") ? QUrl(source).toLocalFile() : source;
+        QFileInfo info(path);
+        if (!info.isFile() || !info.isReadable() || !QImageReader(path).canRead())
+            return false;
+        const QString extension = info.suffix().toLower();
+        if (extension != "jpg" && extension != "jpeg" &&
+            extension != "png" && extension != "webp") return false;
+        const QString directory = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)
+                                  + "/neo-os/wallpapers";
+        if (!QDir().mkpath(directory)) return false;
+        QFile original(path);
+        if (!original.open(QIODevice::ReadOnly)) return false;
+        // Bound resource consumption; enough for normal desktop wallpapers.
+        if (original.size() > 25 * 1024 * 1024 || original.size() <= 0) return false;
+        const QByteArray digest = QCryptographicHash::hash(original.readAll(), QCryptographicHash::Sha256).toHex();
+        const QString destination = directory + "/custom-" + QString::fromLatin1(digest.left(16)) + "." + extension;
+        original.close();
+        if (!QFile::exists(destination) && !QFile::copy(path, destination))
+            return false;
+        if (!setWallpaperPath(destination)) return false;
+        refreshWallpapers();
+        return true;
+    }
     double wallpaperDim() const { return wallpaperDim_; }
     Q_INVOKABLE void setWallpaperDim(double amount) {
         const double safe = qBound(0.0, amount, 0.72);
@@ -183,6 +217,7 @@ public:
 signals:
     void pinnedAppsChanged();
     void wallpaperUrlChanged();
+    void wallpaperThemesChanged();
     void wallpaperDimChanged();
     void accentThemeChanged();
 private:
