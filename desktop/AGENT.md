@@ -69,3 +69,9 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - `Main.qml` central orbit has responsive geometry, layered circle/plinth visuals, larger hub, and focusable overlay Buttons for **each** real pinned app, plus right-click unpin. Keep functional launch/pin and Matrix integration intact.
 - Transform/position animations guard on `!root.reducedMotion`. Avoid raster mockups masquerading as interactive controls.
 - Required manual tests: reference comparison, 1360×820 and 1024×640, Tab/Enter/Space, Ctrl+Space, right-click pin persistence, colors and hover/reduced motion. GitHub source tests and Qt build alone don't prove visual or accessibility correctness.
+
+## Glass-orbit v0.5 pass
+- `OrbitalGlassScene.qml` is a dedicated 2.5D Canvas background behind the **functional** orbital app buttons; `OrbitalGlassBubble.qml` paints separate glass texture for each pinned app icon.
+- New files must be included in `qt_add_qml_module` in CMake; control semantics and app IDs must remain in `Main.qml`.
+- Do not call Canvas effects genuine 3D or real desktop blur. Shader/Quick3D renderer will be a distinct scoped feature if visual acceptance still falls short.
+- CI + Ubuntu runtime screenshot, QML console warnings, performance, keyboard, app-pinning and small-window validations are required before merge.
