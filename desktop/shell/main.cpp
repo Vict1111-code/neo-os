@@ -373,6 +373,8 @@ int main(int argc, char *argv[]) {
     QQmlApplicationEngine engine;
     engine.addImageProvider("appicons", new AppIconProvider(backend.icons()));
     engine.rootContext()->setContextProperty("backend", &backend);
+    engine.rootContext()->setContextProperty("orbital3DAvailable",
+        !QCoreApplication::arguments().contains("--desktop-smoke-test"));
     engine.rootContext()->setContextProperty("matrixPty", &matrixPty);
     engine.load(QUrl("qrc:/qt/qml/NeoDesktop/Main.qml"));
     if (engine.rootObjects().isEmpty()) return 1;
