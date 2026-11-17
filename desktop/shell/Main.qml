@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 
 ApplicationWindow {
     id: root
@@ -47,6 +48,7 @@ ApplicationWindow {
             root.openMatrix()
         } else if (name === "Settings" || name === "Appearance") {
             root.showSettings = !root.showSettings
+            if (root.showSettings) backend.refreshWallpapers()
         } else if (name === "Home") {
             root.showAppList = false
             root.showSettings = false
@@ -710,6 +712,17 @@ ApplicationWindow {
         }
     }
 
+    FileDialog {
+        id: wallpaperPicker
+        title: "Choose a NEO-OS wallpaper"
+        fileMode: FileDialog.OpenFile
+        nameFilters: ["Wallpaper images (*.png *.jpg *.jpeg *.webp)"]
+        onAccepted: {
+            root.notice = backend.importWallpaper(selectedFile.toString())
+                ? "Wallpaper imported and saved in the NEO gallery"
+                : "Could not import the selected image"
+        }
+    }
     Rectangle {
         id: appearancePanel
         visible: root.showSettings
@@ -733,27 +746,29 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
             }
-            TextField {
-                id: wallpaperInput
-                Layout.fillWidth: true
-                placeholderText: "/home/you/Pictures/neo-wallpaper.webp"
-                text: decodeURIComponent(backend.wallpaperUrl.toString().replace("file://", ""))
-                Accessible.name: "Absolute local wallpaper file path"
-            }
             RowLayout {
+                Layout.fillWidth: true
                 Button {
-                    text: "Apply wallpaper"
-                    onClicked: root.notice = backend.setWallpaperPath(wallpaperInput.text.trim())
-                        ? "Wallpaper saved" : "Image not found or unsupported"
+                    text: "Choose image from computer…"
+                    Accessible.name: "Browse computer to choose wallpaper"
+                    onClicked: wallpaperPicker.open()
+                    Layout.fillWidth: true
                 }
                 Button {
-                    text: "Use celestial fallback"
+                    text: "Reset"
+                    Accessible.name: "Restore generated celestial fallback"
                     onClicked: {
                         backend.setWallpaperPath("")
-                        wallpaperInput.text = ""
-                        root.notice = "Default NEO celestial wallpaper restored"
+                        root.notice = "Generated celestial wallpaper restored"
                     }
                 }
+            }
+            Text {
+                text: backend.wallpaperUrl === "" ? "Using generated fallback" : "Selected: " + decodeURIComponent(backend.wallpaperUrl.toString().split("/").pop())
+                color: "#b8d7ee"
+                elide: Text.ElideMiddle
+                font.pixelSize: 11
+                Layout.fillWidth: true
             }
             CheckBox {
                 text: "Reduce interface animations"
@@ -762,9 +777,18 @@ ApplicationWindow {
                 Accessible.name: "Reduce interface animations"
             }
             Text { text: "Wallpaper gallery — installed locally"; color: "#ecfaff"; font.bold: true }
-            Flickable {
+            Text {
+                visible: backend.wallpaperThemes.length === 0
+                text: "No gallery images yet. Choose an image above or install the NEO wallpaper pack."
+                color: "#c0d6e8"
+                font.pixelSize: 12
+                wrapMode: Text.WordWrap
                 Layout.fillWidth: true
-                Layout.preferredHeight: 110
+            }
+            Flickable {
+                visible: backend.wallpaperThemes.length > 0
+                Layout.fillWidth: true
+                Layout.preferredHeight: visible ? 110 : 0
                 contentWidth: galleryRow.width
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
