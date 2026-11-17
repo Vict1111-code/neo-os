@@ -366,9 +366,12 @@ ApplicationWindow {
                     threeDimensionalOrbit.item.violet = backend.accentTheme === "violet"
             }
         }
-        onVisibleChanged: {
-            if (threeDimensionalOrbit.item)
-                threeDimensionalOrbit.item.reducedMotion = root.reducedMotion
+        Connections {
+            target: root
+            function onReducedMotionChanged() {
+                if (threeDimensionalOrbit.item)
+                    threeDimensionalOrbit.item.reducedMotion = root.reducedMotion
+            }
         }
         OrbitalGlassScene {
             id: orbitalSurface
