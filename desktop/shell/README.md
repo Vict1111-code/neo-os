@@ -164,3 +164,26 @@ The four user-selected wallpapers are distributed as a downloadable `NEO-OS_Cele
 4. Verify wallpaper rendering, correct image crop, label readability and no visual collision in a real screenshot. If the ZIP is unavailable, manually place clean PNG/JPG/WebP images in the same data directory using the installer. The generated Canvas fallback still works with zero external assets.
 
 The installer copies images into the current user's XDG data directory with no `sudo`; it deliberately refuses symlinks and only accepts simple image file names. It is not an image parser or full security audit. Never execute downloaded scripts unrelated to the repository.
+
+## Issue #9 — Native wallpaper chooser and empty-gallery fix (2026-11-17)
+
+**Why the gallery was empty:** wallpaper binaries are not part of this Git branch. The application only scans `${XDG_DATA_HOME:-$HOME/.local/share}/neo-os/wallpapers`; it cannot automatically access ChatGPT uploads or a ZIP sitting in Downloads.
+
+**Easy method (no typed file paths):** Open **Settings → Choose image from computer…**. The native Qt 6 `FileDialog` lets you select a PNG/JPG/WebP from any readable location. NEO Desktop validates the image, copies it to its own local gallery under the XDG data directory and sets it as your active wallpaper. The gallery refreshes immediately and is saved across application restarts.
+
+To populate all four supplied wallpapers at once:
+```bash
+cd ~/neo-os
+mkdir -p "$HOME/Downloads/neo-wallpapers"
+unzip "$HOME/Downloads/NEO-OS_Celestial_Wallpapers_v0.3.zip" -d "$HOME/Downloads/neo-wallpapers"
+bash desktop/shell/install-wallpapers.sh "$HOME/Downloads/neo-wallpapers/wallpapers"
+```
+Then reopen Settings or restart NEO Desktop. The gallery refreshes whenever Settings opens. The pack remains a separate conversation attachment, not a GitHub-hosted binary asset.
+
+**Ubuntu 24.04 dependency:** install `qml6-module-qtquick-dialogs` if the file chooser's QML import is missing:
+```bash
+sudo apt install qml6-module-qtquick-dialogs
+```
+GitHub Actions installs this module. It adds a native Qt file picker, not system-level file-manager integration.
+
+**Safety/limitations:** the import is a user-initiated copy with a 25 MiB size bound and image-format validation, not a security sandbox. Qt Quick.Dialogs uses the platform's available native dialog integration; behavior varies with desktop session and Qt plugins. No graphics compositor or LFS is required for this functionality.
