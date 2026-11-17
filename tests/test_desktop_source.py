@@ -74,12 +74,26 @@ class DesktopSourceTests(unittest.TestCase):
             "id: orbit", "readonly property real availableWidth",
             "readonly property real hubDiameter", "id: orbitPedestalHalo",
             "id: dockButton", "id: orbitAppButton", "Accessible.description:",
+            "OrbitalGlassScene {", "OrbitalGlassBubble {",
             "root.openApp(orbitApp.modelData, orbitApp.info.name)",
             "backend.unpin(orbitApp.modelData)",
             "enabled: !root.reducedMotion", "root.dockExpanded = !root.dockExpanded"
         ):
             with self.subTest(token=token):
                 self.assertIn(token, qml)
+
+    def test_orbital_glass_scene_is_separate_from_interactions(self):
+        cmake = (SHELL / "CMakeLists.txt").read_text()
+        visual = (SHELL / "OrbitalGlassScene.qml").read_text()
+        bubble = (SHELL / "OrbitalGlassBubble.qml").read_text()
+        for filename in ("OrbitalGlassScene.qml", "OrbitalGlassBubble.qml"):
+            self.assertIn(filename, cmake)
+        for effect in ("createRadialGradient", "createLinearGradient",
+                       "ellipse(ctx", "ctx.arc(", "ctx.rotate("):
+            self.assertIn(effect, visual)
+        for hook in ("property string iconUrl", "property string label",
+                     "property bool focused", "source: sphere.iconUrl"):
+            self.assertIn(hook, bubble)
 
     def test_launcher_avoids_shell_interpolation(self):
         cpp = (SHELL / "main.cpp").read_text()
