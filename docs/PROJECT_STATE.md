@@ -167,3 +167,12 @@ These results are self-reported manual tests, not independent automated PTY life
 - **Status:** source committed, CI and Ubuntu functional testing pending. Do not mark issue #9 accepted without actual image import/gallery screenshots. PR #10 still stacked on unmerged PR #6 and requires review.
 
 - New CI wallpaper backend smoke gate: `--wallpaper-self-test` generates isolated test PNG, imports it via the real C++ method, verifies first-run gallery presets and selected path. Result awaits new CI execution; this does not test the native dialog UI.
+
+## Issue #9 — Wallpaper acceptance evidence (2026-11-17 09:50)
+- User reports **"the wallpaper works now"** and supplied three Ubuntu screenshots on the feature branch.
+- One screenshot shows the full celestial *01 ringed moon citadel* wallpaper rendered behind NEO Desktop's top bar, left rail, center orbit, right cards and bottom dock, with notice `Wallpaper selected: 01 ringed moon citadel`.
+- Another screenshot shows a separately imported custom portrait wallpaper rendered behind the shell, with notice `Wallpaper imported into NEO gallery`, establishing at least one successful GUI file-picker-to-import-to-render path.
+- The third screenshot shows an Appearance gallery containing several wallpaper thumbnails (including a custom imported image), with wallpaper contrast controls and theme buttons. Thus the previous empty-gallery complaint is resolved on this host.
+- **Verified visually:** image selection/rendering, successful custom import, gallery population and manual wallpaper switch. **Not established yet:** selected wallpaper persists after full desktop restart, built-in preset visibility on a clean profile, smallest target-window responsiveness, independent review and final reference-fidelity polish.
+- Last verified GitHub CI run #44051193003 completed successfully for wallpaper C++ backend integration, Qt compile and PTY regression. PR #10 remains open and stacked on PR #6.
+- Next visual sprint should prioritize central orbit size/placement, translucent panel hierarchy, coherent neon glow, bottom dock sizing and responsive layout, without misrepresenting simulated AI/service functionality as working.
