@@ -150,3 +150,11 @@ These results are self-reported manual tests, not independent automated PTY life
 - C++ scans installed local image assets; first sorted image becomes default if no valid saved wallpaper exists; saves wallpaper selection, neon accent and dim strength.
 - QML Settings now presents actual thumbnails, adjustable wallpaper dim/contrast and theme controls; orbital ring glow and bottom dock are refined.
 - **Pending:** CI verification on latest commit, user Ubuntu screenshots, image pack installation, responsive comparison and independently reviewed PR #10. PR #10 remains stacked on open Matrix PR #6.
+
+## Issue #9 — Native file chooser and gallery correction (2026-11-17)
+- User supplied Ubuntu screenshots showing a functioning native UI but **no installed wallpaper thumbnails** and requested an open-and-select image picker rather than path typing.
+- Root cause: the generated ZIP was a separate conversation artifact and had not been installed to the XDG wallpaper directory. The repository does not contain those binary images.
+- Proposed fix on `feat/9-celestial-desktop-refinement`: `QtQuick.Dialogs FileDialog` for selecting local images; C++ `importWallpaper` validates and copies the file to the private XDG wallpaper gallery; `refreshWallpapers` and `wallpaperThemesChanged` refresh thumbnails dynamically. An empty-state explanation is shown when no gallery assets exist.
+- Qt 6 QML dialog module added to CI dependencies, plus new source-regression assertions and usage instructions.
+- **Status:** source committed; current CI and Ubuntu user testing pending. Independent PR review pending. Full visual reference fidelity remains unverified.
+- Visual refinement is mostly possible on the Ubuntu preview; an independent LFS image is required for true boot, compositor, login/session and OS service integration, not for graphical styling or wallpaper selection.
