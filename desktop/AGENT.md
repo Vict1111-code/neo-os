@@ -89,3 +89,7 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 ## Issue #11 — 16:44 contrast correction
 - Latest user screenshot shows overly diffuse pastel sphere after emissive brightening. Preserve dark glass center and high-contrast rim: new deep navy core, reduced direct lighting/emission, weak outer shell, subtle Canvas edge glints; pedestal lights are restrained.
 - This is a material tuning pass, NOT a refraction shader or background sampling implementation. Test on the user's GPU with both scenic and portrait wallpapers. Do not trust offscreen fallback smoke as proof of 3D appearance.
+
+## Issue #11 — alpha compositing architecture correction
+- Current dark inner sphere remains **opaque** in 16:53 Ubuntu screenshot; simply darkening a fully opaque sphere cannot reveal wallpaper behind it. Expose controlled Model.opacity through `glassTransparency` and a visible slider in Appearance; verify live on Ubuntu.
+- Clearly distinguish transparency compositing from refractive background sampling. Do not claim true optical glass. Future materials/reflection shaders must be an isolated, reviewed engineering milestone.
