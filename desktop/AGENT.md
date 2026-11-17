@@ -50,3 +50,9 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - `DesktopBackend` discovers readable image assets in `neo-os/wallpapers`, defaults to sorted `01-ringed-moon-citadel.webp` if installed and no saved choice, and persists selected wallpaper and dim level.
 - `Main.qml` now provides a scrollable thumbnail gallery, wallpaper contrast slider, luminous orbit-ring halo and compact dock styling.
 - Verify actual renders and settings persistence on Ubuntu. CI compile and source checks do not guarantee pixel-level reference fidelity.
+
+## Issue #9 native wallpaper picker (2026-11-17)
+- Screenshots from Ubuntu show no gallery entries because the wallpaper pack was not present in the expected XDG data directory, not because Qt/C++ cannot render image assets.
+- `QtQuick.Dialogs FileDialog` now allows choosing an image through a graphical picker, avoiding manual path entry. `DesktopBackend.importWallpaper()` validates and copies the user-selected image to an XDG wallpaper gallery and refreshes it immediately via `wallpaperThemesChanged`.
+- `refreshWallpapers()` is called on startup and when opening Settings; gallery displays an explicit empty state rather than a blank strip. Qt Quick Dialogs Ubuntu runtime module must be installed.
+- Follow through with source tests, compile CI, Ubuntu picker/selection/gallery/restart screenshots; **do not declare the UI visually equivalent to user concept art yet**. Graphic polish can proceed on Ubuntu; LFS is needed later for the independent OS session, boot and system integration.
