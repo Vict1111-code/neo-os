@@ -197,3 +197,9 @@ These results are self-reported manual tests, not independent automated PTY life
 - `Main.qml` selects 3D via a Loader and keeps the 2.5D fallback; toggle in Appearance. This lets the real pinned app bubble buttons, focus behavior and wallpaper survive.
 - Ubuntu 24.04 uses `qml6-module-quick3d` and `qt6-quick3d-dev`. CI updates/install and static checks are in progress; no Ubuntu GPU screenshot or performance result yet.
 - Need side-by-side review, reduce-motion/shortcut/regression testing, shader/material polish and independent PR review before merging. PR #11 is an issue, not a merged feature.
+
+## Issue #11 — Real Ubuntu GPU visual evidence (2026-11-17 16:36)
+- User supplied a fresh screenshot from the experimental Qt Quick 3D branch: the sphere, app bubbles, orbit light waves and pedestal are present in the NEO Desktop preview. This establishes that the new 3D scene **renders something** on the user's HP all-in-one, not that exact visual appearance has been achieved.
+- Visible deficiency: dark nearly flat-looking sphere, black solid cylinder pedestal, missing reference-level reflections/refraction, bloom and glass texture. UI and wallpaper remained visible. App click/keyboard behavior was not explicitly retested in this message.
+- Material revision: actual 3D opaque illuminated core plus translucent shell, increased lighting intensity, five pedestal layers including emissive cyan rim and themed inner ring. Added regression assertions and documented gap vs full reference. **Updated Ubuntu screenshot and CI are pending**.
+- PR #12 remains open and stacked on PR #10 (based on #6); do not merge before dependencies/review and actual UI acceptance.
