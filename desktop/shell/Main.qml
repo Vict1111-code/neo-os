@@ -14,6 +14,7 @@ ApplicationWindow {
     color: "#060d24"
 
     property bool reducedMotion: false
+    property bool prefer3DOrbit: orbital3DAvailable
     property bool showAppList: false
     property bool showMatrix: false
     property bool showSettings: false
@@ -343,10 +344,37 @@ ApplicationWindow {
         readonly property real hubDiameter: Math.min(127, Math.max(102, width * 0.27))
 
         // The high-detail glass-sphere artwork is rendered separately from app hit targets.
+        Loader {
+            id: threeDimensionalOrbit
+            anchors.fill: parent
+            z: -1
+            active: root.prefer3DOrbit
+            source: "OrbitalSphere3D.qml"
+            onLoaded: {
+                item.violet = backend.accentTheme === "violet"
+                item.reducedMotion = root.reducedMotion
+            }
+            onStatusChanged: {
+                if (status === Loader.Error)
+                    root.notice = "3D unavailable: using the lightweight glass-orbit fallback"
+            }
+        }
+        Connections {
+            target: backend
+            function onAccentThemeChanged() {
+                if (threeDimensionalOrbit.item)
+                    threeDimensionalOrbit.item.violet = backend.accentTheme === "violet"
+            }
+        }
+        onVisibleChanged: {
+            if (threeDimensionalOrbit.item)
+                threeDimensionalOrbit.item.reducedMotion = root.reducedMotion
+        }
         OrbitalGlassScene {
             id: orbitalSurface
             anchors.fill: parent
             violet: backend.accentTheme === "violet"
+            visible: threeDimensionalOrbit.status !== Loader.Ready
             z: -1
         }
         Rectangle {
@@ -870,6 +898,12 @@ ApplicationWindow {
                     onMoved: backend.setWallpaperDim(value)
                 }
                 Text { text: Math.round(backend.wallpaperDim * 100) + "%"; color: "#c8eaff" }
+            }
+            CheckBox {
+                text: "Use experimental 3D orbital sphere"
+                checked: root.prefer3DOrbit
+                onToggled: root.prefer3DOrbit = checked
+                Accessible.name: "Toggle experimental 3D orbital sphere"
             }
             Text { text: "Accent theme"; color: "#ecfaff"; font.bold: true }
             RowLayout {
