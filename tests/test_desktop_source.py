@@ -50,7 +50,8 @@ class DesktopSourceTests(unittest.TestCase):
             "backend.setWallpaperPath(", "backend.setAccentTheme(",
             "backend.pinnedApps", "backend.availableApps",
             "backend.wallpaperThemes", "backend.wallpaperDim",
-            "backend.setWallpaperDim(",
+            "backend.setWallpaperDim(", "FileDialog {", "wallpaperPicker.open()",
+            "backend.importWallpaper(", "backend.refreshWallpapers()",
             "NEO AI ASSISTANT", "SYSTEM STATUS", "NEO MARKET",
             "DEVICES & SYNC", "Ctrl+Space", "Ctrl+K",
             "not connected", "not implemented", "root.reducedMotion"
@@ -60,7 +61,8 @@ class DesktopSourceTests(unittest.TestCase):
         for token in ("QImageReader(path).canRead()", "wallpaperThemes READ wallpaperThemes",
                       "QStandardPaths::GenericDataLocation", "appearance/dim", "appearance/wallpaper",
                       "appearance/accent", "wallpaperUrlChanged()",
-                      "accentThemeChanged()"):
+                      "accentThemeChanged()", "wallpaperThemesChanged()",
+                      "QCryptographicHash::Sha256", "Q_INVOKABLE bool importWallpaper("):
             with self.subTest(token=token):
                 self.assertIn(token, cpp)
 
