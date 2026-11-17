@@ -72,7 +72,7 @@ class DesktopSourceTests(unittest.TestCase):
         qml = (SHELL / "Main.qml").read_text()
         for token in (
             "id: orbit", "readonly property real availableWidth",
-            "readonly property real hubDiameter", "id: orbitPedestalHalo",
+            "readonly property real hubDiameter", "OrbitalGlassScene {",
             "id: dockButton", "id: orbitAppButton", "Accessible.description:",
             "OrbitalGlassScene {", "OrbitalGlassBubble {",
             "root.openApp(orbitApp.modelData, orbitApp.info.name)",
