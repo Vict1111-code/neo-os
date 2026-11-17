@@ -247,3 +247,10 @@ Open **Settings → Use experimental 3D orbital sphere** to switch between the G
 - Test 1024×640 and a full-size screenshot; record GPU/CPU performance and graphical warnings.
 - If QML reports `module QtQuick3D is not installed`, verify the Ubuntu package; if it renders black, report graphics backend and Qt warnings.
 - Shaders/texture maps, bloom pipeline, proper refraction, fully modeled orbit bands and platform detail remain future steps. Do **not** advertise exact matching before the screenshots demonstrate it.
+
+### Ubuntu v0.6 screenshot review and 3D lighting correction (2026-11-17)
+User screenshot confirms the experimental Quick 3D scene loads and remains embedded in the celestial desktop, with real pinned app bubbles, but reveals a **nearly black central sphere and solid dark pedestal**. Core problem in the scene code: highly metallic, dark, stacked transparent shells with no image-based light probe give poor perceived illumination; the podium had only two dark cylinders.
+
+The next increment changes the mesh composition to a **lit opaque colored core** plus a restrained transparent outer shell, brighter directional/point lights, and five layered pedestal discs with luminous cyan/purple rims. `PrincipledMaterial.emissiveFactor` adds visible self-illumination, not true light emission onto neighboring objects, and the rings still use the Canvas overlay. A realistic environment reflection/light probe, refraction, screen-space background blur and bloom pipeline remain future tasks.
+
+After updating, compare new Ubuntu screenshots with the previous result. In Settings, toggle **Use experimental 3D orbital sphere** and **Reduce interface animations**. Check that actual Linux app icons still launch and the 2.5D fallback remains. If sphere or pedestal appears dark/black, capture console warnings and GPU info. A successful CI compile does **not** establish the look on the target HP all-in-one GPU.
