@@ -183,3 +183,10 @@ These results are self-reported manual tests, not independent automated PTY life
 - No new GPU/QtQuick3D dependency; current pass uses transparent 2D shapes and QML property animations with reduced-motion guard.
 - Source regression checks added for orbit layout and semantic launch/focus hooks.
 - **Pending:** latest CI build and Ubuntu screenshot, keyboard and compact-window regression. This is an incremental approximation of reference depth, not yet pixel-perfect and not yet peer-reviewed.
+
+## Issue #9 — Reference glass-orbit compositor (2026-11-17)
+- User supplied cropped central orb reference and new Ubuntu screenshot; current flat Qt circles are still far from requested rendered 3D glass, texture, wave curves and neon pedestal.
+- New `OrbitalGlassScene.qml` separates sphere volume/rim lighting, orbital waves and platform drawing into a Qt Canvas visual layer. New `OrbitalGlassBubble.qml` renders glossy bubbles around real pinned Linux app icon images.
+- `Main.qml` retains accessibility and app launch actions as independent Buttons over visual sprites. CMake, source tests and handoff documentation updated.
+- **Important fidelity limit**: these are 2.5D procedural effects, not a full physically-based 3D sphere, real background refractive blur, or image-identical photoreal rendering. No user runtime confirmation yet; latest CI pending.
+- PR #10 remains open and stacked on unmerged Matrix PTY PR #6.
