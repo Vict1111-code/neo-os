@@ -19,6 +19,7 @@
 #include <QLinearGradient>
 #include <QRadialGradient>
 #include <QRandomGenerator>
+#include <QTemporaryDir>
 #include <QDir>
 #include <QFile>
 #include <QCryptographicHash>
@@ -346,6 +347,27 @@ int main(int argc, char *argv[]) {
     app.setApplicationName("NEO Desktop Preview");
     app.setOrganizationName("NEO-OS");
     DesktopBackend backend;
+    if (QCoreApplication::arguments().contains("--wallpaper-self-test")) {
+        // Headless CI probe of the same backend called by the native FileDialog.
+        QTemporaryDir temporary;
+        if (!temporary.isValid()) return 4;
+        const QString png = temporary.filePath("NEO test wallpaper.png");
+        QImage sample(1280, 720, QImage::Format_RGB32);
+        sample.fill(QColor("#204c88"));
+        if (!sample.save(png, "PNG")) return 5;
+        const bool imported = backend.importWallpaper(QUrl::fromLocalFile(png).toString());
+        const bool galleryPopulated = backend.wallpaperThemes().size() >= 5;
+        const bool selected = !backend.wallpaperUrl().isEmpty() &&
+                              QFileInfo(QUrl(backend.wallpaperUrl()).toLocalFile()).isReadable();
+        if (!imported || !galleryPopulated || !selected) {
+            qCritical().noquote() << "Wallpaper self-test failed" << backend.wallpaperError()
+                                 << "gallery count:" << backend.wallpaperThemes().size();
+            return 6;
+        }
+        qInfo() << "Wallpaper backend self-test passed; gallery count:"
+                << backend.wallpaperThemes().size();
+        return 0;
+    }
     MatrixPty matrixPty;
     QQmlApplicationEngine engine;
     engine.addImageProvider("appicons", new AppIconProvider(backend.icons()));
