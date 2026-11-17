@@ -176,3 +176,10 @@ These results are self-reported manual tests, not independent automated PTY life
 - **Verified visually:** image selection/rendering, successful custom import, gallery population and manual wallpaper switch. **Not established yet:** selected wallpaper persists after full desktop restart, built-in preset visibility on a clean profile, smallest target-window responsiveness, independent review and final reference-fidelity polish.
 - Last verified GitHub CI run #44051193003 completed successfully for wallpaper C++ backend integration, Qt compile and PTY regression. PR #10 remains open and stacked on PR #6.
 - Next visual sprint should prioritize central orbit size/placement, translucent panel hierarchy, coherent neon glow, bottom dock sizing and responsive layout, without misrepresenting simulated AI/service functionality as working.
+
+## Issue #9 — Orbital launcher v0.4 visual refinement (2026-11-17)
+- User supplied a circled reference screenshot and requested primary attention to orbit hub scale, 3D-like depth, radial icon spacing, hover and keyboard focus.
+- Updated QML orbit to size to remaining central desktop width/height, larger center hub, luminous halo layers, thin spherical crossing highlight, elliptical plinth, improved icon labels and focusable launch Buttons. Right-click unpin preserved.
+- No new GPU/QtQuick3D dependency; current pass uses transparent 2D shapes and QML property animations with reduced-motion guard.
+- Source regression checks added for orbit layout and semantic launch/focus hooks.
+- **Pending:** latest CI build and Ubuntu screenshot, keyboard and compact-window regression. This is an incremental approximation of reference depth, not yet pixel-perfect and not yet peer-reviewed.
