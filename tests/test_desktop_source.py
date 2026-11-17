@@ -62,7 +62,9 @@ class DesktopSourceTests(unittest.TestCase):
                       "QStandardPaths::GenericDataLocation", "appearance/dim", "appearance/wallpaper",
                       "appearance/accent", "wallpaperUrlChanged()",
                       "accentThemeChanged()", "wallpaperThemesChanged()",
-                      "QCryptographicHash::Sha256", "Q_INVOKABLE bool importWallpaper("):
+                      "QCryptographicHash::Sha256", "Q_INVOKABLE bool importWallpaper(",
+                      "ensureBuiltInWallpapers()", "wallpaperErrorChanged()",
+                      "image.save(destination, \"PNG\")"):
             with self.subTest(token=token):
                 self.assertIn(token, cpp)
 
