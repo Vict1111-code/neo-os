@@ -260,3 +260,10 @@ The material tuning from the prior pass made the sphere **too luminous and opaqu
 
 ### 3D glass clarity control — 16:53 visual feedback
 The newest Ubuntu screenshot shows a darker sphere, but the opaque core still hides the scenery instead of resembling transparent glass. The **3D glass clarity** slider in Settings now adjusts transparency of both real 3D `#Sphere` model layers; the default is 78%. It is not physically accurate glass or blur and does not persist yet. Change the slider without rebuilding and compare the same wallpaper at several values. Check for depth/sorting artifacts and whether icons remain keyboard-operable. **Do not accept reference visual parity based solely on alpha blending.**
+
+### v0.7 image-based lighting and polished glass (Issue #11)
+The previous transparency tuning alone cannot create realistic specular reflections. This branch now generates a deterministic **low-dynamic-range equirectangular studio reflection probe** in the user's XDG data folder (`neo-os/render/orbital_studio_probe_v1.png`). It is created locally using QPainter (no downloads or privilege escalation), and the Qt Quick 3D `SceneEnvironment.lightProbe` consumes it to supply *actual environment-based lighting* to sphere/pedestal materials. A clearcoat layer is also applied to the outer shell.
+
+In Appearance, toggle **Studio reflections (experimental)** on/off while the 3D scene is active and compare the glossy highlight structure. The 3D glass clarity slider remains adjustable. The generated probe is independent of the currently chosen desktop wallpaper; it is not real-time screen-space reflection/refraction or an HDRI. The probe's specular quality depends on the Qt Quick 3D runtime, available graphics backend and material opacity.
+
+The headless wallpaper backend test also confirms that the local PNG probe is present and readable. **GitHub's software offscreen QML smoke intentionally uses the non-3D fallback**, so confirm actual GPU illumination using Ubuntu screenshots and logs before accepting. No LFS build is required.
