@@ -115,6 +115,17 @@ class DesktopSourceTests(unittest.TestCase):
         self.assertIn('id: podium', scene)
         self.assertGreaterEqual(scene.count('source: "#Cylinder"'), 4)
         self.assertIn('baseColor: "#164969"', scene)
+        # Reflection source must be generated and consumed by the actual Qt 3D environment.
+        cpp = (SHELL / "main.cpp").read_text()
+        self.assertIn("ensureOrbitalLightProbe();", cpp)
+        self.assertIn('Q_PROPERTY(QString orbitalLightProbeUrl', cpp)
+        self.assertIn('orbital_studio_probe_v1.png', cpp)
+        self.assertIn('const bool lightProbeAvailable', cpp)
+        self.assertIn('lightProbe: Texture {', scene)
+        self.assertIn('source: scene.imageBasedLighting ? scene.lightProbeUrl : ""', scene)
+        self.assertIn('clearcoatAmount: 0.65', scene)
+        self.assertIn('item.lightProbeUrl = backend.orbitalLightProbeUrl', qml)
+        self.assertIn('Accessible.name: "Toggle orbital image based lighting"', qml)
         self.assertIn('id: glassRim', scene)
         self.assertIn('baseColor: scene.violet ? "#201239" : "#0d2141"', scene)
 
