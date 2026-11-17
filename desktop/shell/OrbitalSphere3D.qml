@@ -9,11 +9,18 @@ Item {
     property bool reducedMotion: false
     // 0 = opaque blue volume, 1 = almost clear; adjustable without recompiling.
     property real glassTransparency: 0.78
+    property url lightProbeUrl: ""
+    property bool imageBasedLighting: true
 
     View3D {
         anchors.fill: parent
         environment: SceneEnvironment {
             backgroundMode: SceneEnvironment.Transparent
+            // LDR equirectangular studio panorama supplied by DesktopBackend.
+            // Real image-based lighting, but NOT wallpaper-space refraction.
+            lightProbe: Texture {
+                source: scene.imageBasedLighting ? scene.lightProbeUrl : ""
+            }
             antialiasingMode: SceneEnvironment.MSAA
             antialiasingQuality: SceneEnvironment.Medium
         }
@@ -64,6 +71,8 @@ Item {
                     metalness: 0.11
                     roughness: 0.08
                     specularAmount: 1.0
+                    clearcoatAmount: 0.65
+                    clearcoatRoughness: 0.10
                     alphaMode: PrincipledMaterial.Blend
                 }
             }
