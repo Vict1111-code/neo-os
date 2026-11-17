@@ -22,41 +22,44 @@ Item {
         }
         DirectionalLight {
             eulerRotation: Qt.vector3d(-40, -34, 0)
-            brightness: 1.6
+            brightness: 2.0
             color: "#90dfff"
         }
         PointLight {
             x: -225; y: 170; z: 275
-            brightness: 55
+            brightness: 95
             color: "#6dddff"
         }
         PointLight {
             x: 240; y: -95; z: 175
-            brightness: 42
+            brightness: 85
             color: scene.violet ? "#ff4ff1" : "#d47aff"
         }
         Node {
             id: rotatingSphere
-            // A sphere with real 3D mesh normals and material-based highlights.
-            Model {
-                source: "#Sphere"
-                scale: Qt.vector3d(3.9, 3.9, 3.9)
-                materials: PrincipledMaterial {
-                    baseColor: "#8b204d9a"
-                    metalness: 0.27
-                    roughness: 0.13
-                    specularAmount: 1.0
-                    alphaMode: PrincipledMaterial.Blend
-                }
-            }
+            // Keep a lit opaque core beneath a restrained translucent shell.
+            // Highly metallic, under-lit layers previously rendered nearly black.
             Model {
                 source: "#Sphere"
                 scale: Qt.vector3d(3.78, 3.78, 3.78)
                 materials: PrincipledMaterial {
-                    baseColor: "#bf0d205b"
-                    metalness: 0.65
-                    roughness: 0.22
+                    baseColor: scene.violet ? "#6545af" : "#327ac8"
+                    metalness: 0.14
+                    roughness: 0.34
+                    specularAmount: 0.95
+                    emissiveFactor: Qt.vector3d(0.035, 0.095, 0.17)
+                }
+            }
+            Model {
+                source: "#Sphere"
+                scale: Qt.vector3d(3.9, 3.9, 3.9)
+                materials: PrincipledMaterial {
+                    baseColor: scene.violet ? "#345eb9f8" : "#304dcaff"
+                    metalness: 0.06
+                    roughness: 0.11
+                    specularAmount: 1.0
                     alphaMode: PrincipledMaterial.Blend
+                    depthDrawMode: Material.OpaqueOnlyDepthDraw
                 }
             }
             NumberAnimation on eulerRotation.y {
@@ -68,26 +71,64 @@ Item {
             }
         }
 
-        // Physically positioned segmented cylindrical pedestal geometry.
+        // Built-in cylinders use 100-unit mesh dimensions. The horizontal
+        // scales create discs/rims; materials are bright enough without an IBL probe.
         Node {
+            id: podium
             y: -223
             Model {
                 source: "#Cylinder"
-                scale: Qt.vector3d(5.3, 0.35, 1.9)
+                scale: Qt.vector3d(5.25, 0.25, 2.15)
                 materials: PrincipledMaterial {
-                    baseColor: "#10234e"
-                    metalness: 0.75
-                    roughness: 0.22
+                    baseColor: "#273b75"
+                    metalness: 0.23
+                    roughness: 0.28
+                    emissiveFactor: Qt.vector3d(0.02, 0.035, 0.085)
                 }
             }
             Model {
-                y: 18
+                y: 20
                 source: "#Cylinder"
-                scale: Qt.vector3d(4.65, 0.12, 1.65)
+                scale: Qt.vector3d(4.95, 0.085, 1.98)
                 materials: PrincipledMaterial {
-                    baseColor: "#25628c"
-                    metalness: 0.86
-                    roughness: 0.17
+                    baseColor: "#21b9ef"
+                    metalness: 0.08
+                    roughness: 0.31
+                    emissiveFactor: Qt.vector3d(0.05, 0.48, 0.72)
+                }
+            }
+            Model {
+                y: 29
+                source: "#Cylinder"
+                scale: Qt.vector3d(4.68, 0.10, 1.88)
+                materials: PrincipledMaterial {
+                    baseColor: "#101e50"
+                    metalness: 0.27
+                    roughness: 0.23
+                    emissiveFactor: Qt.vector3d(0.025, 0.04, 0.11)
+                }
+            }
+            Model {
+                y: 35
+                source: "#Cylinder"
+                scale: Qt.vector3d(3.78, 0.028, 1.48)
+                materials: PrincipledMaterial {
+                    baseColor: scene.violet ? "#bd61eb" : "#33d8ef"
+                    metalness: 0.05
+                    roughness: 0.45
+                    emissiveFactor: scene.violet
+                        ? Qt.vector3d(0.55, 0.13, 0.80)
+                        : Qt.vector3d(0.05, 0.64, 0.80)
+                }
+            }
+            Model {
+                y: 39
+                source: "#Cylinder"
+                scale: Qt.vector3d(3.52, 0.04, 1.32)
+                materials: PrincipledMaterial {
+                    baseColor: "#0c2147"
+                    metalness: 0.15
+                    roughness: 0.36
                 }
             }
         }
