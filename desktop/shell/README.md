@@ -206,3 +206,6 @@ Screenshots showed the native dialog but no image selection result and an empty 
 **Manual acceptance after updating the branch:** confirm 4+ thumbnails even without installing the ZIP; pick each preset, restart, then choose a WebP from Downloads and confirm it becomes a `custom-*.png` gallery entry, remains visible on the background and persists on restart. If it fails, copy the visible error text or run `./out/neo-desktop/neo-desktop 2>&1 | tee neo-desktop-wallpaper.log`.
 
 **Important:** Generated presets and conversion do not prove the final reference-standard GUI; full image-pack distribution and composition refinement remain open.
+
+### Automated wallpaper regression gate
+`neo-desktop --wallpaper-self-test` runs without loading QML: it seeds four built-in PNG presets and verifies that a synthetic local PNG is imported, selected, and visible in the gallery model. CI runs it with `QT_QPA_PLATFORM=offscreen` and a disposable `XDG_DATA_HOME`. This tests the C++ backend but **does not simulate clicking through FileDialog**; Ubuntu manual GUI testing remains required.
