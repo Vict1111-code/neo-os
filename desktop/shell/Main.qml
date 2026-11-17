@@ -325,134 +325,253 @@ ApplicationWindow {
         }
     }
 
-    // Functional orbital launcher. Its populated apps come from the Linux host.
+    // NEO orbital launcher v0.4: native interactive dock, not a wallpaper overlay.
+    // Layout is constrained between the navigation rail, cards, and bottom taskbar.
     Item {
         id: orbit
         z: 3
-        width: Math.min(380, root.width * 0.33)
+        readonly property real availableWidth: root.width - (sideRail.x + sideRail.width) -
+                                               rightPanels.width - 58
+        width: Math.min(470, Math.max(310, availableWidth * 0.63),
+                        Math.max(300, (root.height - 160) * 0.83))
         height: width
         x: sideRail.x + sideRail.width +
-           (root.width - sideRail.x - sideRail.width - rightPanels.width - 24 - width) / 2
-        y: Math.max(216, (root.height - height) / 2 - 2)
-        property real orbitRadius: root.dockExpanded ? width * 0.37 : width * 0.29
-        Behavior on orbitRadius {
-            enabled: !root.reducedMotion
-            NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
-        }
+           (root.width - (sideRail.x + sideRail.width) - rightPanels.width - width) / 2
+        y: Math.max(154, Math.min(root.height - height - 93, root.height * 0.57 - height / 2))
+        readonly property real iconDiameter: Math.min(75, Math.max(49, width * 0.16))
+        readonly property real orbitRadius: root.dockExpanded ? width * 0.355 : width * 0.295
+        readonly property real hubDiameter: Math.min(122, Math.max(96, width * 0.255))
+
+        // A floor-like luminous elliptical pedestal gives the sphere some depth.
         Rectangle {
-            anchors.centerIn: parent
-            width: orbit.orbitRadius * 2 + 55
-            height: width
-            radius: width / 2
-            color: "transparent"
-            border.width: 10
+            id: orbitPedestalHalo
+            z: -1
+            x: orbit.width * 0.05
+            y: orbit.height * 0.78
+            width: orbit.width * 0.90
+            height: orbit.height * 0.20
+            radius: height / 2
+            color: "#20122f62"
             border.color: root.neon
-            opacity: 0.12
+            border.width: 3
+            opacity: 0.67
+        }
+        Rectangle {
+            z: -1
+            x: orbit.width * 0.16
+            y: orbit.height * 0.82
+            width: orbit.width * 0.68
+            height: orbit.height * 0.115
+            radius: height / 2
+            color: "#1938c5e9"
+            border.color: "#cc82fe"
+            border.width: 2
+            opacity: 0.62
         }
         Rectangle {
             anchors.centerIn: parent
-            width: orbit.orbitRadius * 2 + 22
+            width: orbit.orbitRadius * 2 + 72
             height: width
             radius: width / 2
-            color: "#34082350"
+            color: "#0813213c"
+            border.color: root.neon
+            border.width: 12
+            opacity: 0.10
+            Behavior on width {
+                enabled: !root.reducedMotion
+                NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
+            }
+        }
+        Rectangle {
+            anchors.centerIn: parent
+            width: orbit.orbitRadius * 2 + 34
+            height: width
+            radius: width / 2
+            color: "#15132960"
             border.width: 3
             border.color: root.neon
-            opacity: 0.8
+            opacity: 0.85
+            Behavior on width {
+                enabled: !root.reducedMotion
+                NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
+            }
         }
         Rectangle {
             anchors.centerIn: parent
-            width: orbit.orbitRadius * 2 - 35
+            width: orbit.orbitRadius * 2 - 30
             height: width
             radius: width / 2
-            color: "#14152554"
-            border.color: "#cb67fc"
+            color: "#1b1d3179"
+            border.color: "#db81ff"
             border.width: 2
+            opacity: 0.84
+            Behavior on width {
+                enabled: !root.reducedMotion
+                NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
+            }
+        }
+        // An understated crossing highlight hints at a transparent spherical surface.
+        Rectangle {
+            anchors.centerIn: parent
+            width: orbit.orbitRadius * 2 + 20
+            height: Math.max(42, width * 0.20)
+            radius: height / 2
+            color: "transparent"
+            border.color: "#927eefff"
+            border.width: 2
+            opacity: 0.27
+            rotation: -16
+        }
+        Rectangle {
+            id: hubAura
+            anchors.centerIn: parent
+            width: orbit.hubDiameter + 32
+            height: width
+            radius: width / 2
+            color: "#3156bbf2"
+            border.color: root.neon
+            border.width: 6
+            opacity: 0.22
         }
         Rectangle {
             id: dockCenter
             anchors.centerIn: parent
-            width: Math.max(92, orbit.width * 0.27)
+            width: orbit.hubDiameter
             height: width
             radius: width / 2
             gradient: Gradient {
-                GradientStop { position: 0; color: "#345eb3" }
-                GradientStop { position: 0.48; color: "#263e8d" }
-                GradientStop { position: 1; color: "#1b1850" }
+                GradientStop { position: 0; color: "#5777d6" }
+                GradientStop { position: 0.45; color: "#293e9b" }
+                GradientStop { position: 1; color: "#18163f" }
             }
             border.width: 4
-            border.color: dockButton.activeFocus ? "#f9d078" : "#b96bfa"
+            border.color: dockButton.activeFocus ? "#ffdc91" :
+                          dockButton.hovered ? "#ffffff" : "#cb80ff"
+            scale: dockButton.pressed ? 0.96 : dockButton.hovered ? 1.07 : 1
+            Behavior on scale {
+                enabled: !root.reducedMotion
+                NumberAnimation { duration: 140 }
+            }
+            Rectangle {
+                anchors.centerIn: parent
+                width: parent.width - 17
+                height: width
+                radius: width / 2
+                color: "transparent"
+                border.width: 1
+                border.color: "#8ccaff"
+                opacity: 0.6
+            }
             Text {
                 anchors.centerIn: parent
                 text: "▦"
-                font.pixelSize: 44
-                color: "#a2faff"
+                font.pixelSize: orbit.hubDiameter * 0.51
+                color: "#a5f8ff"
+                style: Text.Outline
+                styleColor: "#387be1"
             }
             Button {
                 id: dockButton
                 anchors.fill: parent
-                opacity: 0
+                flat: true
                 focusPolicy: Qt.StrongFocus
                 Accessible.name: root.dockExpanded ? "Collapse orbital dock" : "Expand orbital dock"
+                Accessible.description: "Press Enter or Space to toggle orbital icon spacing."
                 onClicked: root.dockExpanded = !root.dockExpanded
+                background: Item {}
+                contentItem: Item {}
             }
         }
         Repeater {
             model: backend.pinnedApps
-            delegate: Rectangle {
+            delegate: Item {
+                id: orbitApp
                 required property string modelData
                 required property int index
                 readonly property var info: backend.appById(modelData)
                 readonly property int count: Math.max(1, backend.pinnedApps.length)
-                readonly property real angle: -Math.PI / 2 + 2 * Math.PI * index / count
-                readonly property int iconSize: Math.max(43, Math.min(66, orbit.width * 0.17))
-                width: iconSize
-                height: iconSize
-                radius: width / 2
-                x: orbit.width / 2 + Math.cos(angle) * orbit.orbitRadius - width / 2
-                y: orbit.height / 2 + Math.sin(angle) * orbit.orbitRadius - height / 2
-                color: "#d1112853"
-                border.color: orbitMouse.containsMouse ? "#ffe7a0" : root.neon
-                border.width: 2
-                scale: root.dockExpanded ? 1 : 0.9
-                Behavior on scale { enabled: !root.reducedMotion; NumberAnimation { duration: 200 } }
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 1
-                    Image {
-                        id: orbitIcon
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        width: 31; height: 31
-                        source: "image://appicons/" + modelData
-                        sourceSize.width: 31
-                        sourceSize.height: 31
-                        fillMode: Image.PreserveAspectFit
+                readonly property real angle: -Math.PI / 2 + Math.PI * 2 * index / count
+                readonly property real radiusFromHub: orbit.orbitRadius
+                width: orbit.iconDiameter
+                height: orbit.iconDiameter
+                x: orbit.width / 2 + Math.cos(angle) * radiusFromHub - width / 2
+                y: orbit.height / 2 + Math.sin(angle) * radiusFromHub - height / 2
+                z: 2
+                Behavior on x {
+                    enabled: !root.reducedMotion
+                    NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
+                }
+                Behavior on y {
+                    enabled: !root.reducedMotion
+                    NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
+                }
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: -5
+                    radius: width / 2
+                    color: root.neon
+                    opacity: orbitAppButton.hovered || orbitAppButton.activeFocus ? 0.19 : 0.05
+                }
+                Rectangle {
+                    anchors.fill: parent
+                    radius: width / 2
+                    color: "#df10264d"
+                    border.width: orbitAppButton.activeFocus ? 3 : 2
+                    border.color: orbitAppButton.activeFocus ? "#ffdc91" :
+                                  orbitAppButton.hovered ? "#ffffff" : root.neon
+                    scale: orbitAppButton.pressed ? 0.95 :
+                           orbitAppButton.hovered || orbitAppButton.activeFocus ? 1.12 : 1
+                    Behavior on scale {
+                        enabled: !root.reducedMotion
+                        NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
                     }
-                    Text {
-                        visible: orbitIcon.status !== Image.Ready
-                        text: info.name ? info.name.slice(0, 1) : "?"
-                        color: "#e5ffff"
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                    Text {
-                        text: info.name || "App"
-                        width: 61
-                        horizontalAlignment: Text.AlignHCenter
-                        elide: Text.ElideRight
-                        color: "#e6f9ff"
-                        font.pixelSize: 9
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 3
+                        Image {
+                            id: appOrbitIcon
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: Math.round(orbitApp.width * 0.47)
+                            height: width
+                            source: "image://appicons/" + orbitApp.modelData
+                            sourceSize.width: width
+                            sourceSize.height: height
+                            fillMode: Image.PreserveAspectFit
+                        }
+                        Text {
+                            visible: appOrbitIcon.status !== Image.Ready
+                            text: orbitApp.info.name ? orbitApp.info.name.slice(0, 1) : "?"
+                            color: "#e9ffff"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.pixelSize: 16
+                        }
+                        Text {
+                            text: orbitApp.info.name || "Application"
+                            width: orbitApp.width - 8
+                            horizontalAlignment: Text.AlignHCenter
+                            elide: Text.ElideRight
+                            color: "#f6ffff"
+                            font.pixelSize: orbitApp.width >= 64 ? 10 : 9
+                        }
                     }
                 }
-                MouseArea {
-                    id: orbitMouse
+                Button {
+                    id: orbitAppButton
                     anchors.fill: parent
-                    hoverEnabled: true
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    onEntered: if (!root.reducedMotion) root.dockExpanded = true
-                    onClicked: mouse => {
-                        if (mouse.button === Qt.RightButton)
-                            root.notice = backend.unpin(modelData) ? "Unpinned " + info.name : "Cannot unpin"
-                        else root.openApp(modelData, info.name)
-                    }
+                    flat: true
+                    focusPolicy: Qt.StrongFocus
+                    Accessible.name: "Launch " + orbitApp.info.name
+                    Accessible.description: "Press Enter or Space to open application."
+                    background: Item {}
+                    contentItem: Item {}
+                    onClicked: root.openApp(orbitApp.modelData, orbitApp.info.name)
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.RightButton
+                    onClicked: root.notice = backend.unpin(orbitApp.modelData)
+                                      ? "Unpinned " + orbitApp.info.name
+                                      : "Unable to unpin"
                 }
             }
         }
