@@ -22,41 +22,42 @@ Item {
         }
         DirectionalLight {
             eulerRotation: Qt.vector3d(-40, -34, 0)
-            brightness: 2.0
+            brightness: 1.15
             color: "#90dfff"
         }
         PointLight {
             x: -225; y: 170; z: 275
-            brightness: 95
+            brightness: 32
             color: "#6dddff"
         }
         PointLight {
             x: 240; y: -95; z: 175
-            brightness: 85
+            brightness: 20
             color: scene.violet ? "#ff4ff1" : "#d47aff"
         }
         Node {
             id: rotatingSphere
-            // Keep a lit opaque core beneath a restrained translucent shell.
-            // Highly metallic, under-lit layers previously rendered nearly black.
+            // A deep, restrained core carries dimensional shading while the outer
+            // layer is faint and specular. Bright core illumination previously
+            // flattened the entire sphere into an opaque pastel disc.
             Model {
                 source: "#Sphere"
                 scale: Qt.vector3d(3.78, 3.78, 3.78)
                 materials: PrincipledMaterial {
-                    baseColor: scene.violet ? "#6545af" : "#327ac8"
-                    metalness: 0.14
-                    roughness: 0.34
+                    baseColor: scene.violet ? "#201239" : "#0d2141"
+                    metalness: 0.17
+                    roughness: 0.25
                     specularAmount: 0.95
-                    emissiveFactor: Qt.vector3d(0.035, 0.095, 0.17)
+                    emissiveFactor: Qt.vector3d(0.008, 0.022, 0.046)
                 }
             }
             Model {
                 source: "#Sphere"
                 scale: Qt.vector3d(3.9, 3.9, 3.9)
                 materials: PrincipledMaterial {
-                    baseColor: scene.violet ? "#345eb9f8" : "#304dcaff"
-                    metalness: 0.06
-                    roughness: 0.11
+                    baseColor: scene.violet ? "#1e8b6dc8" : "#207dbce9"
+                    metalness: 0.11
+                    roughness: 0.08
                     specularAmount: 1.0
                     alphaMode: PrincipledMaterial.Blend
                 }
@@ -90,10 +91,10 @@ Item {
                 source: "#Cylinder"
                 scale: Qt.vector3d(4.95, 0.085, 1.98)
                 materials: PrincipledMaterial {
-                    baseColor: "#21b9ef"
+                    baseColor: "#164969"
                     metalness: 0.08
                     roughness: 0.31
-                    emissiveFactor: Qt.vector3d(0.05, 0.48, 0.72)
+                    emissiveFactor: Qt.vector3d(0.015, 0.19, 0.30)
                 }
             }
             Model {
@@ -112,12 +113,12 @@ Item {
                 source: "#Cylinder"
                 scale: Qt.vector3d(3.78, 0.028, 1.48)
                 materials: PrincipledMaterial {
-                    baseColor: scene.violet ? "#bd61eb" : "#33d8ef"
+                    baseColor: scene.violet ? "#743e9a" : "#177c9b"
                     metalness: 0.05
                     roughness: 0.45
                     emissiveFactor: scene.violet
-                        ? Qt.vector3d(0.55, 0.13, 0.80)
-                        : Qt.vector3d(0.05, 0.64, 0.80)
+                        ? Qt.vector3d(0.19, 0.045, 0.32)
+                        : Qt.vector3d(0.015, 0.26, 0.37)
                 }
             }
             Model {
