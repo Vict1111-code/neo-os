@@ -190,3 +190,34 @@ These results are self-reported manual tests, not independent automated PTY life
 - `Main.qml` retains accessibility and app launch actions as independent Buttons over visual sprites. CMake, source tests and handoff documentation updated.
 - **Important fidelity limit**: these are 2.5D procedural effects, not a full physically-based 3D sphere, real background refractive blur, or image-identical photoreal rendering. No user runtime confirmation yet; latest CI pending.
 - PR #10 remains open and stacked on unmerged Matrix PTY PR #6.
+
+## Issue #11 — GPU 3D orb feasibility (2026-11-17)
+- New user screenshot of v0.5 shows drawn volumetric appearance and concentric trails, but still far from photoreal glass/material reference. Explicit 3D renderer spike started in `feat/11-quick3d-orbital-sphere`, based on active visual branch (PR #10).
+- `OrbitalSphere3D.qml` introduces actual `#Sphere` geometry, perspective camera, real lights, two transparent-ish PrincipledMaterials, a cylinder-geometry pedestal and 2D elliptical glow curves. The source code is real 3D but **not** an exact physically refractive glass or fully 3D light-wave model.
+- `Main.qml` selects 3D via a Loader and keeps the 2.5D fallback; toggle in Appearance. This lets the real pinned app bubble buttons, focus behavior and wallpaper survive.
+- Ubuntu 24.04 uses `qml6-module-quick3d` and `qt6-quick3d-dev`. CI updates/install and static checks are in progress; no Ubuntu GPU screenshot or performance result yet.
+- Need side-by-side review, reduce-motion/shortcut/regression testing, shader/material polish and independent PR review before merging. PR #11 is an issue, not a merged feature.
+
+## Issue #11 — Real Ubuntu GPU visual evidence (2026-11-17 16:36)
+- User supplied a fresh screenshot from the experimental Qt Quick 3D branch: the sphere, app bubbles, orbit light waves and pedestal are present in the NEO Desktop preview. This establishes that the new 3D scene **renders something** on the user's HP all-in-one, not that exact visual appearance has been achieved.
+- Visible deficiency: dark nearly flat-looking sphere, black solid cylinder pedestal, missing reference-level reflections/refraction, bloom and glass texture. UI and wallpaper remained visible. App click/keyboard behavior was not explicitly retested in this message.
+- Material revision: actual 3D opaque illuminated core plus translucent shell, increased lighting intensity, five pedestal layers including emissive cyan rim and themed inner ring. Added regression assertions and documented gap vs full reference. **Updated Ubuntu screenshot and CI are pending**.
+- PR #12 remains open and stacked on PR #10 (based on #6); do not merge before dependencies/review and actual UI acceptance.
+
+## Issue #11 — Ubuntu 16:44 visual correction (2026-11-17)
+- The user supplied another real Ubuntu GPU screenshot after the brighter-material pass: the sphere now rendered as an **overbright, opaque pastel cyan/pink ball**, while the five-layer pedestal appeared unnaturally luminous. The reference instead shows dark translucent-looking navy glass, coherent rim highlights and detailed metallic lighting.
+- Adjusted sphere core from bright diffuse blue to **deep navy/violet**, substantially reduced direct light and emissive intensities, kept a weak specular outer shell, and reduced pedestal luminosity. Added subtle edge-glint Canvas to suggest glass without claiming physical refraction.
+- Added source regression checks for the updated material palette and edge details. **This exact revision has not yet been visually verified on the user's GPU**; do not claim reference parity or solved rendering. Continue toward HDR/reflection probe, real shader material, bloom and depth-correct ring geometry with performance measurements.
+- PR #12 remains stacked on PR #10 and PR #6 and awaits CI, runtime acceptance and review.
+
+## Issue #11 — Ubuntu GPU screenshot 16:53:22, transparency control (2026-11-17)
+- User's new screenshot verifies the darker core, reduced-glow podium and orbital trails load on their Ubuntu host, over the celestial wallpaper. **Visual acceptance remains open:** the sphere still obscures the backdrop like a solid disc, compared with the transparent refractive glass in the close-up reference.
+- Root technical cause: the original inner `#Sphere` has an opaque PrincipledMaterial. A translucent outer sphere and a transparent View3D cannot reveal the wallpaper through the inner fully opaque mesh. Further color/brightness tuning alone cannot fix this.
+- Branch introduces `glassTransparency` on the actual inner/outer 3D models and a live **3D glass clarity** slider in Appearance for visual comparison on the user's GPU. This is *alpha compositing*, **not refraction, HDR IBL, Fresnel or blur**. Source tests ensure the control reaches the 3D scene; pending CI and hardware confirmation.
+- Later engineering targets: proper physically shaded/custom refractive material, environment reflection/light probe, depth-aware ring geometry, designed bloom/pedestal and performance validation. Retain 2.5D fallback and accessibility.
+
+## Issue #11 — Image-based lighting v0.7 experiment (2026-11-17)
+- After repeated Ubuntu screenshots showing opaque/dark or overbright spheres, material-only tuning reached diminishing returns. The next step adds an actual image-based lighting input using a locally generated equirectangular `orbital_studio_probe_v1.png` texture and `SceneEnvironment.lightProbe`, plus an outer clearcoat.
+- C++ generates the LDR reflection environment on startup and exposes its file URL. User-facing Appearance adds Studio reflections ON/OFF for same-scene comparison. The existing clarity slider and 2.5D fallback remain.
+- Probe generation is included in headless backend testing. **This is material lighting only:** no physical refraction, live background sampling, HDR capture, ray tracing, volumetric bloom or depth-correct orbital trails.
+- Latest source committed on stacked PR #12; CI and actual Ubuntu GPU comparison remain required. Do not merge without acceptance/review; PR #12 -> PR #10 -> PR #6.

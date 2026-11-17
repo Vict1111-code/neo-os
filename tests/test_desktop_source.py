@@ -95,6 +95,46 @@ class DesktopSourceTests(unittest.TestCase):
                      "property bool focused", "source: sphere.iconUrl"):
             self.assertIn(hook, bubble)
 
+    def test_experimental_3d_scene_and_safe_fallback(self):
+        qml = (SHELL / "Main.qml").read_text()
+        cmake = (SHELL / "CMakeLists.txt").read_text()
+        scene = (SHELL / "OrbitalSphere3D.qml").read_text()
+        for token in ("Loader {", 'source: "OrbitalSphere3D.qml"',
+                      "visible: threeDimensionalOrbit.status !== Loader.Ready",
+                      "property bool prefer3DOrbit", "root.prefer3DOrbit = checked"):
+            self.assertIn(token, qml)
+        self.assertIn("OrbitalSphere3D.qml", cmake)
+        # The opaque inner shell and translucent outer shell must coexist;
+        # fully metallic dark layers previously made the model nearly black.
+        self.assertIn('emissiveFactor: Qt.vector3d(0.008, 0.022, 0.046)', scene)
+        self.assertIn('property real glassTransparency: 0.78', scene)
+        self.assertIn('opacity: 1.0 - scene.glassTransparency * 0.92', scene)
+        self.assertIn('opacity: 0.50 - scene.glassTransparency * 0.30', scene)
+        self.assertIn("onOrbitGlassTransparencyChanged()", qml)
+        self.assertIn('Accessible.name: "3D orbital glass transparency"', qml)
+        self.assertIn('id: podium', scene)
+        self.assertGreaterEqual(scene.count('source: "#Cylinder"'), 4)
+        self.assertIn('baseColor: "#164969"', scene)
+        # Reflection source must be generated and consumed by the actual Qt 3D environment.
+        cpp = (SHELL / "main.cpp").read_text()
+        self.assertIn("ensureOrbitalLightProbe();", cpp)
+        self.assertIn('Q_PROPERTY(QString orbitalLightProbeUrl', cpp)
+        self.assertIn('orbital_studio_probe_v1.png', cpp)
+        self.assertIn('const bool lightProbeAvailable', cpp)
+        self.assertIn('lightProbe: Texture {', scene)
+        self.assertIn('source: scene.imageBasedLighting ? scene.lightProbeUrl : ""', scene)
+        self.assertIn('clearcoatAmount: 0.65', scene)
+        self.assertIn('item.lightProbeUrl = backend.orbitalLightProbeUrl', qml)
+        self.assertIn('Accessible.name: "Toggle orbital image based lighting"', qml)
+        self.assertIn('id: glassRim', scene)
+        self.assertIn('baseColor: scene.violet ? "#201239" : "#0d2141"', scene)
+
+        for token in ("import QtQuick3D", "View3D {",
+                      "source: \"#Sphere\"", "PerspectiveCamera {",
+                      "DirectionalLight {", "PointLight {",
+                      "SceneEnvironment.Transparent", "PrincipledMaterial {"):
+            self.assertIn(token, scene)
+
     def test_launcher_avoids_shell_interpolation(self):
         cpp = (SHELL / "main.cpp").read_text()
         self.assertIn('QProcess::startDetached("gio", {"launch", appPaths.value(id)})', cpp)

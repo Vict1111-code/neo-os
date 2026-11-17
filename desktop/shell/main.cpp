@@ -52,6 +52,7 @@ class DesktopBackend : public QObject {
     Q_PROPERTY(QStringList pinnedApps READ pinnedApps NOTIFY pinnedAppsChanged)
     Q_PROPERTY(QVariantList availableApps READ availableApps CONSTANT)
     Q_PROPERTY(QString wallpaperUrl READ wallpaperUrl NOTIFY wallpaperUrlChanged)
+    Q_PROPERTY(QString orbitalLightProbeUrl READ orbitalLightProbeUrl CONSTANT)
     Q_PROPERTY(QVariantList wallpaperThemes READ wallpaperThemes NOTIFY wallpaperThemesChanged)
     Q_PROPERTY(double wallpaperDim READ wallpaperDim NOTIFY wallpaperDimChanged)
     Q_PROPERTY(QString wallpaperError READ wallpaperError NOTIFY wallpaperErrorChanged)
@@ -90,6 +91,7 @@ public:
         accent_ = settings.value("appearance/accent", "cyan").toString();
         if (accent_ != "cyan" && accent_ != "violet") accent_ = "cyan";
         wallpaperDim_ = qBound(0.0, settings.value("appearance/dim", 0.22).toDouble(), 0.72);
+        ensureOrbitalLightProbe();
         ensureBuiltInWallpapers();
         refreshWallpapers();
         const QString oldWallpaper = settings.value("appearance/wallpaper").toString();
@@ -110,6 +112,7 @@ public:
             }
         }
     }
+    QString orbitalLightProbeUrl() const { return orbitalLightProbeUrl_; }
     QString wallpaperUrl() const { return wallpaper_; }
     QVariantList wallpaperThemes() const { return themes_; }
     Q_INVOKABLE void refreshWallpapers() {
@@ -267,6 +270,62 @@ signals:
     void wallpaperErrorChanged();
     void accentThemeChanged();
 private:
+    // Generate a deterministic LDR equirectangular probe as a local runtime asset.
+    // The horizontal light streaks simulate studio/celestial reflectors; this
+    // lights *3D materials*, unlike painting 2D reflections onto the orb.
+    // It is NOT a true HDR capture of the user's wallpaper/environment.
+    void ensureOrbitalLightProbe() {
+        const QString folder = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)
+                               + "/neo-os/render";
+        if (!QDir().mkpath(folder)) {
+            qWarning() << "Unable to create orbital lighting folder" << folder;
+            return;
+        }
+        const QString file = folder + "/orbital_studio_probe_v1.png";
+        if (!QFileInfo::exists(file)) {
+            QImage image(1024, 512, QImage::Format_RGB32);
+            QPainter painter(&image);
+            painter.setRenderHint(QPainter::Antialiasing);
+            QLinearGradient base(0, 0, 0, 512);
+            base.setColorAt(0, QColor("#0e1836"));
+            base.setColorAt(0.32, QColor("#153462"));
+            base.setColorAt(0.61, QColor("#090f2b"));
+            base.setColorAt(1, QColor("#16112b"));
+            painter.fillRect(image.rect(), base);
+
+            // Bright blue, cyan and violet softboxes across the panorama.
+            struct LightBox { int x; int y; int w; int h; QColor color; };
+            const LightBox boxes[] = {
+                {95, 72, 120, 255, QColor(100, 222, 255, 220)},
+                {362, 54, 72, 260, QColor(220, 183, 255, 210)},
+                {640, 95, 150, 195, QColor(67, 186, 255, 185)},
+                {884, 120, 55, 180, QColor(255, 180, 119, 140)}
+            };
+            painter.setPen(Qt::NoPen);
+            for (const auto &b : boxes) {
+                QLinearGradient bar(b.x, 0, b.x + b.w, 0);
+                QColor faint = b.color;
+                faint.setAlpha(0);
+                bar.setColorAt(0, faint);
+                bar.setColorAt(0.19, b.color);
+                bar.setColorAt(0.78, b.color);
+                bar.setColorAt(1, faint);
+                painter.setBrush(bar);
+                painter.drawRoundedRect(QRect(b.x, b.y, b.w, b.h), 24, 24);
+            }
+            QRadialGradient blueGlow(QPointF(512, 190), 330);
+            blueGlow.setColorAt(0, QColor(38, 119, 240, 45));
+            blueGlow.setColorAt(1, Qt::transparent);
+            painter.fillRect(image.rect(), blueGlow);
+            painter.end();
+            if (!image.save(file, "PNG")) {
+                qWarning() << "Unable to write local orbital reflection probe" << file;
+                return;
+            }
+        }
+        if (QImageReader(file).canRead())
+            orbitalLightProbeUrl_ = QUrl::fromLocalFile(file).toString();
+    }
     QString wallpaperDirectory() const {
         return QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)
                + "/neo-os/wallpapers";
@@ -337,6 +396,7 @@ private:
     QVariantList apps;
     QStringList pins;
     QString wallpaper_;
+    QString orbitalLightProbeUrl_;
     QString wallpaperError_;
     QVariantList themes_;
     double wallpaperDim_ = 0.22;
@@ -358,9 +418,11 @@ int main(int argc, char *argv[]) {
         if (!sample.save(png, "PNG")) return 5;
         const bool imported = backend.importWallpaper(QUrl::fromLocalFile(png).toString());
         const bool galleryPopulated = backend.wallpaperThemes().size() >= 5;
+        const bool lightProbeAvailable = !backend.orbitalLightProbeUrl().isEmpty() &&
+            QImageReader(QUrl(backend.orbitalLightProbeUrl()).toLocalFile()).canRead();
         const bool selected = !backend.wallpaperUrl().isEmpty() &&
                               QFileInfo(QUrl(backend.wallpaperUrl()).toLocalFile()).isReadable();
-        if (!imported || !galleryPopulated || !selected) {
+        if (!imported || !galleryPopulated || !selected || !lightProbeAvailable) {
             qCritical().noquote() << "Wallpaper self-test failed" << backend.wallpaperError()
                                  << "gallery count:" << backend.wallpaperThemes().size();
             return 6;
@@ -373,6 +435,8 @@ int main(int argc, char *argv[]) {
     QQmlApplicationEngine engine;
     engine.addImageProvider("appicons", new AppIconProvider(backend.icons()));
     engine.rootContext()->setContextProperty("backend", &backend);
+    engine.rootContext()->setContextProperty("orbital3DAvailable",
+        !QCoreApplication::arguments().contains("--desktop-smoke-test"));
     engine.rootContext()->setContextProperty("matrixPty", &matrixPty);
     engine.load(QUrl("qrc:/qt/qml/NeoDesktop/Main.qml"));
     if (engine.rootObjects().isEmpty()) return 1;

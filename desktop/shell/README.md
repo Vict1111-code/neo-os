@@ -228,3 +228,42 @@ The user requested the **3D-like refractive sphere, luminous elliptical waves an
 This is an intentional compositing layer, not a true geometric 3D model, per-pixel backdrop refraction, framebuffer blur or physically based renderer. **Exact parity with photoreal reference art is not yet established.** A shader-based implementation with Qt 6 RHI/Qt Quick 3D may be required for per-pixel normals, blur, textured transparency and realtime volumetric lighting. Prefer reviewing Ubuntu screenshots first before adding GPU complexity.
 
 Manual test: open the orbital launcher, check the glass globe appears behind eight (or however many are pinned) app spheres, compare pedestal and curved bands against reference, press Tab/Enter to launch, right-click to unpin, Ctrl+Space to expand, and verify low-motion behavior. Test at full and compact window sizes and check for Canvas redraw errors in the terminal log.
+
+## Issue #11 — Experimental Qt Quick 3D glass sphere spike (2026-11-17)
+
+Screenshot review of the 2.5D orbit shows basic curves and light trails work, but physically shaped reflective materials are still missing. This stacked experimental branch adds `OrbitalSphere3D.qml` with **genuine 3D sphere mesh and perspective camera**, two real lights, PrincipledMaterial shading, and a modeled pedestal, while the orbital trails and clickable app bubbles remain QML overlays. It is a feasibility spike, **not** an exact photoreal reproduction or physically accurate glass refraction.
+
+### Ubuntu prerequisites
+```bash
+sudo apt install qt6-quick3d-dev qml6-module-quick3d
+```
+This package spelling is for Ubuntu 24.04. Run this only if you accept adding Qt developer/runtime packages on your existing Ubuntu machine. LFS is not required to run Qt Quick 3D.
+
+Open **Settings → Use experimental 3D orbital sphere** to switch between the GPU 3D attempt and retained procedural 2.5D fallback. A missing Qt Quick 3D module should leave the 2.5D renderer available. This mode is currently opt-in/on for normal desktop launches; offscreen software CI smoke disables the 3D Loader to protect its graphics-independent test. User GPU compatibility is **not established**.
+
+### Test after CI
+- Confirm 3D sphere is visible and responsive at the real Ubuntu display resolution, and contrast it with the fallback using the checkbox.
+- Test changing cyan/violet, Reduce Animations, Ctrl+Space, Tab+Enter application launch, right-click unpin, wallpaper/file picker, Matrix CLI.
+- Test 1024×640 and a full-size screenshot; record GPU/CPU performance and graphical warnings.
+- If QML reports `module QtQuick3D is not installed`, verify the Ubuntu package; if it renders black, report graphics backend and Qt warnings.
+- Shaders/texture maps, bloom pipeline, proper refraction, fully modeled orbit bands and platform detail remain future steps. Do **not** advertise exact matching before the screenshots demonstrate it.
+
+### Ubuntu v0.6 screenshot review and 3D lighting correction (2026-11-17)
+User screenshot confirms the experimental Quick 3D scene loads and remains embedded in the celestial desktop, with real pinned app bubbles, but reveals a **nearly black central sphere and solid dark pedestal**. Core problem in the scene code: highly metallic, dark, stacked transparent shells with no image-based light probe give poor perceived illumination; the podium had only two dark cylinders.
+
+The next increment changes the mesh composition to a **lit opaque colored core** plus a restrained transparent outer shell, brighter directional/point lights, and five layered pedestal discs with luminous cyan/purple rims. `PrincipledMaterial.emissiveFactor` adds visible self-illumination, not true light emission onto neighboring objects, and the rings still use the Canvas overlay. A realistic environment reflection/light probe, refraction, screen-space background blur and bloom pipeline remain future tasks.
+
+After updating, compare new Ubuntu screenshots with the previous result. In Settings, toggle **Use experimental 3D orbital sphere** and **Reduce interface animations**. Check that actual Linux app icons still launch and the 2.5D fallback remains. If sphere or pedestal appears dark/black, capture console warnings and GPU info. A successful CI compile does **not** establish the look on the target HP all-in-one GPU.
+
+### 3D glass contrast correction after Ubuntu screenshot (2026-11-17)
+The material tuning from the prior pass made the sphere **too luminous and opaque** on the user's machine. The next revision deliberately darkens the opaque 3D core to navy/violet, reduces direct/point-light intensity and pedestal emission, and adds narrow low-opacity edge highlights to suggest glass. It does not yet offer physically correct refraction, screen-space blur or environment reflections. Test with a busy photoreal wallpaper and with a simple solid background, then compare against the close-up reference. A screenshot is needed to determine whether the tuning worked.
+
+### 3D glass clarity control — 16:53 visual feedback
+The newest Ubuntu screenshot shows a darker sphere, but the opaque core still hides the scenery instead of resembling transparent glass. The **3D glass clarity** slider in Settings now adjusts transparency of both real 3D `#Sphere` model layers; the default is 78%. It is not physically accurate glass or blur and does not persist yet. Change the slider without rebuilding and compare the same wallpaper at several values. Check for depth/sorting artifacts and whether icons remain keyboard-operable. **Do not accept reference visual parity based solely on alpha blending.**
+
+### v0.7 image-based lighting and polished glass (Issue #11)
+The previous transparency tuning alone cannot create realistic specular reflections. This branch now generates a deterministic **low-dynamic-range equirectangular studio reflection probe** in the user's XDG data folder (`neo-os/render/orbital_studio_probe_v1.png`). It is created locally using QPainter (no downloads or privilege escalation), and the Qt Quick 3D `SceneEnvironment.lightProbe` consumes it to supply *actual environment-based lighting* to sphere/pedestal materials. A clearcoat layer is also applied to the outer shell.
+
+In Appearance, toggle **Studio reflections (experimental)** on/off while the 3D scene is active and compare the glossy highlight structure. The 3D glass clarity slider remains adjustable. The generated probe is independent of the currently chosen desktop wallpaper; it is not real-time screen-space reflection/refraction or an HDRI. The probe's specular quality depends on the Qt Quick 3D runtime, available graphics backend and material opacity.
+
+The headless wallpaper backend test also confirms that the local PNG probe is present and readable. **GitHub's software offscreen QML smoke intentionally uses the non-3D fallback**, so confirm actual GPU illumination using Ubuntu screenshots and logs before accepting. No LFS build is required.

@@ -75,3 +75,27 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - New files must be included in `qt_add_qml_module` in CMake; control semantics and app IDs must remain in `Main.qml`.
 - Do not call Canvas effects genuine 3D or real desktop blur. Shader/Quick3D renderer will be a distinct scoped feature if visual acceptance still falls short.
 - CI + Ubuntu runtime screenshot, QML console warnings, performance, keyboard, app-pinning and small-window validations are required before merge.
+
+## Issue #11 — Qt Quick 3D feasibility spike
+- This **stacked** feature branch `feat/11-quick3d-orbital-sphere` is based on PR #10's `feat/9-celestial-desktop-refinement`, which itself depends on Matrix PR #6.
+- `OrbitalSphere3D.qml` uses actual 3D primitives and lights, but 2D orbital trails and bubbles are still overlays. The user wants true material depth, backdrop blur/refraction and polished pedestal; these are **not** delivered yet.
+- `Main.qml` contains a Loader for the new scene plus the existing `OrbitalGlassScene` fallback. Preserve real Linux app launch actions/accessibility and make reduced-motion propagation work.
+- CI installs Ubuntu Quick 3D dependencies and runs existing software-rendering smoke with 3D intentionally disabled; a hardware-accelerated Ubuntu run is required for acceptance.
+
+## Issue #11 — post-GPU-screenshot material tuning
+- The screenshot confirmed actual 3D execution but dark, underlit sphere and nearly black podium. We revised `OrbitalSphere3D.qml` from dark mostly-metallic shells to opaque colored core + light transparent outer shell and layered cyan/violet illuminated podium discs. Keep fallback intact.
+- `emissiveFactor` is a material appearance property; do not claim it performs bloom or physically lights the scene. Compare actual Ubuntu renders, GPU usage, zoom/compact geometry and accessibility before accepting.
+
+## Issue #11 — 16:44 contrast correction
+- Latest user screenshot shows overly diffuse pastel sphere after emissive brightening. Preserve dark glass center and high-contrast rim: new deep navy core, reduced direct lighting/emission, weak outer shell, subtle Canvas edge glints; pedestal lights are restrained.
+- This is a material tuning pass, NOT a refraction shader or background sampling implementation. Test on the user's GPU with both scenic and portrait wallpapers. Do not trust offscreen fallback smoke as proof of 3D appearance.
+
+## Issue #11 — alpha compositing architecture correction
+- Current dark inner sphere remains **opaque** in 16:53 Ubuntu screenshot; simply darkening a fully opaque sphere cannot reveal wallpaper behind it. Expose controlled Model.opacity through `glassTransparency` and a visible slider in Appearance; verify live on Ubuntu.
+- Clearly distinguish transparency compositing from refractive background sampling. Do not claim true optical glass. Future materials/reflection shaders must be an isolated, reviewed engineering milestone.
+
+## Issue #11 — v0.7 IBL experiment
+- `DesktopBackend.ensureOrbitalLightProbe()` creates a small deterministic equirectangular LDR PNG in `$XDG_DATA_HOME/neo-os/render` and exposes `orbitalLightProbeUrl`. The `--wallpaper-self-test` now checks this asset without external downloads.
+- `OrbitalSphere3D.qml` loads the texture through `SceneEnvironment.lightProbe` and uses clearcoat on the outer shell. `Main.qml` adds a runtime experimental IBL toggle, retaining glass clarity, real app buttons and 2.5D fallback.
+- Distinguish real environment-lighting from **true refraction**, realtime wallpaper reflection, depth-aware curved orbit geometry and bloom. Do not claim those are implemented.
+- Check hardware GPU rendering, screenshot compare probe ON/OFF with same wallpaper, GPU/CPU cost, and possible Qt 6.4 material compatibility warnings.

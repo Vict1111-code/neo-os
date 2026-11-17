@@ -14,6 +14,9 @@ ApplicationWindow {
     color: "#060d24"
 
     property bool reducedMotion: false
+    property bool prefer3DOrbit: orbital3DAvailable
+    property real orbitGlassTransparency: 0.78
+    property bool orbitImageBasedLighting: true
     property bool showAppList: false
     property bool showMatrix: false
     property bool showSettings: false
@@ -343,10 +346,51 @@ ApplicationWindow {
         readonly property real hubDiameter: Math.min(127, Math.max(102, width * 0.27))
 
         // The high-detail glass-sphere artwork is rendered separately from app hit targets.
+        Loader {
+            id: threeDimensionalOrbit
+            anchors.fill: parent
+            z: -1
+            active: root.prefer3DOrbit
+            source: "OrbitalSphere3D.qml"
+            onLoaded: {
+                item.violet = backend.accentTheme === "violet"
+                item.reducedMotion = root.reducedMotion
+                item.glassTransparency = root.orbitGlassTransparency
+                item.lightProbeUrl = backend.orbitalLightProbeUrl
+                item.imageBasedLighting = root.orbitImageBasedLighting
+            }
+            onStatusChanged: {
+                if (status === Loader.Error)
+                    root.notice = "3D unavailable: using the lightweight glass-orbit fallback"
+            }
+        }
+        Connections {
+            target: backend
+            function onAccentThemeChanged() {
+                if (threeDimensionalOrbit.item)
+                    threeDimensionalOrbit.item.violet = backend.accentTheme === "violet"
+            }
+        }
+        Connections {
+            target: root
+            function onReducedMotionChanged() {
+                if (threeDimensionalOrbit.item)
+                    threeDimensionalOrbit.item.reducedMotion = root.reducedMotion
+            }
+            function onOrbitGlassTransparencyChanged() {
+                if (threeDimensionalOrbit.item)
+                    threeDimensionalOrbit.item.glassTransparency = root.orbitGlassTransparency
+            }
+            function onOrbitImageBasedLightingChanged() {
+                if (threeDimensionalOrbit.item)
+                    threeDimensionalOrbit.item.imageBasedLighting = root.orbitImageBasedLighting
+            }
+        }
         OrbitalGlassScene {
             id: orbitalSurface
             anchors.fill: parent
             violet: backend.accentTheme === "violet"
+            visible: threeDimensionalOrbit.status !== Loader.Ready
             z: -1
         }
         Rectangle {
@@ -734,7 +778,7 @@ ApplicationWindow {
         visible: root.showSettings
         z: 31
         width: Math.min(520, root.width - 50)
-        height: Math.min(520, root.height - 80)
+        height: Math.min(580, root.height - 80)
         anchors.centerIn: parent
         radius: 18
         color: "#f20a1730"
@@ -870,6 +914,46 @@ ApplicationWindow {
                     onMoved: backend.setWallpaperDim(value)
                 }
                 Text { text: Math.round(backend.wallpaperDim * 100) + "%"; color: "#c8eaff" }
+            }
+            CheckBox {
+                text: "Use experimental 3D orbital sphere"
+                checked: root.prefer3DOrbit
+                onToggled: root.prefer3DOrbit = checked
+                Accessible.name: "Toggle experimental 3D orbital sphere"
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                visible: root.prefer3DOrbit
+                Text { text: "3D glass clarity"; color: "#e9f9ff" }
+                Slider {
+                    id: orbitalClarity
+                    Layout.fillWidth: true
+                    from: 0
+                    to: 0.95
+                    stepSize: 0.05
+                    value: root.orbitGlassTransparency
+                    onMoved: root.orbitGlassTransparency = value
+                    Accessible.name: "3D orbital glass transparency"
+                }
+                Text {
+                    text: Math.round(root.orbitGlassTransparency * 100) + "%"
+                    color: "#bfeaff"
+                }
+            }
+            Text {
+                visible: root.prefer3DOrbit
+                text: "Clarity controls transparency only, not real-world refraction."
+                color: "#b4c9e2"
+                font.pixelSize: 10
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+            }
+            CheckBox {
+                visible: root.prefer3DOrbit
+                text: "Studio reflections (experimental)"
+                checked: root.orbitImageBasedLighting
+                onToggled: root.orbitImageBasedLighting = checked
+                Accessible.name: "Toggle orbital image based lighting"
             }
             Text { text: "Accent theme"; color: "#ecfaff"; font.bold: true }
             RowLayout {
