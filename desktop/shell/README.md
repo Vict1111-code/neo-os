@@ -209,3 +209,14 @@ Screenshots showed the native dialog but no image selection result and an empty 
 
 ### Automated wallpaper regression gate
 `neo-desktop --wallpaper-self-test` runs without loading QML: it seeds four built-in PNG presets and verifies that a synthetic local PNG is imported, selected, and visible in the gallery model. CI runs it with `QT_QPA_PLATFORM=offscreen` and a disposable `XDG_DATA_HOME`. This tests the C++ backend but **does not simulate clicking through FileDialog**; Ubuntu manual GUI testing remains required.
+
+## Orbital launcher v0.4 visual pass — Issue #9 (2026-11-17)
+
+The reference-highlighted spherical launcher is now a functional Qt/QML component, not a static image: larger responsive hub, layered luminous rings, underside elliptical pedestal, hover/press lighting, active keyboard focus and radial icon layout sourced from the real pinned application list.
+
+- The orbital area now accounts for available space **between** left navigation and right cards and avoids the bottom dock on medium window heights.
+- Each pinned app has a keyboard-focusable native `Button` over a styled circular container; Enter/Space launches via the existing Linux backend. Right-click on an icon unpins it.
+- The center `dockButton` retains Ctrl+Space expand/collapse and shows a gold focus ring; the hover/press transformations are disabled when Reduce interface animations is selected.
+- These are 2D QML effects (several translucent circles and gradients). They are intentionally lightweight for midrange hardware and do not require Qt Quick 3D or Linux From Scratch.
+
+**Manual Ubuntu acceptance:** take screenshot at full size and at 1024×640; check orbit does not cover right cards, sidebar, or bottom dock. Verify all icons launch, keyboard Tab+Enter, right-click unpin and persistence, Ctrl+Space, wallpaper, Matrix CLI, and reduced motion. Note: screenshot fidelity to the original visual concept is still under review.
