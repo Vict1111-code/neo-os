@@ -104,6 +104,13 @@ class DesktopSourceTests(unittest.TestCase):
                       "property bool prefer3DOrbit", "root.prefer3DOrbit = checked"):
             self.assertIn(token, qml)
         self.assertIn("OrbitalSphere3D.qml", cmake)
+        # The opaque inner shell and translucent outer shell must coexist;
+        # fully metallic dark layers previously made the model nearly black.
+        self.assertIn('emissiveFactor: Qt.vector3d(0.035, 0.095, 0.17)', scene)
+        self.assertIn('id: podium', scene)
+        self.assertGreaterEqual(scene.count('source: "#Cylinder"'), 4)
+        self.assertIn('baseColor: "#21b9ef"', scene)
+
         for token in ("import QtQuick3D", "View3D {",
                       "source: \"#Sphere\"", "PerspectiveCamera {",
                       "DirectionalLight {", "PointLight {",
