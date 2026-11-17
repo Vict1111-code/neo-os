@@ -107,6 +107,11 @@ class DesktopSourceTests(unittest.TestCase):
         # The opaque inner shell and translucent outer shell must coexist;
         # fully metallic dark layers previously made the model nearly black.
         self.assertIn('emissiveFactor: Qt.vector3d(0.008, 0.022, 0.046)', scene)
+        self.assertIn('property real glassTransparency: 0.78', scene)
+        self.assertIn('opacity: 1.0 - scene.glassTransparency * 0.92', scene)
+        self.assertIn('opacity: 0.50 - scene.glassTransparency * 0.30', scene)
+        self.assertIn("onOrbitGlassTransparencyChanged()", qml)
+        self.assertIn('Accessible.name: "3D orbital glass transparency"', qml)
         self.assertIn('id: podium', scene)
         self.assertGreaterEqual(scene.count('source: "#Cylinder"'), 4)
         self.assertIn('baseColor: "#164969"', scene)
