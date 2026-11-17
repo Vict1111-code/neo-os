@@ -16,6 +16,7 @@ ApplicationWindow {
     property bool reducedMotion: false
     property bool prefer3DOrbit: orbital3DAvailable
     property real orbitGlassTransparency: 0.78
+    property bool orbitImageBasedLighting: true
     property bool showAppList: false
     property bool showMatrix: false
     property bool showSettings: false
@@ -355,6 +356,8 @@ ApplicationWindow {
                 item.violet = backend.accentTheme === "violet"
                 item.reducedMotion = root.reducedMotion
                 item.glassTransparency = root.orbitGlassTransparency
+                item.lightProbeUrl = backend.orbitalLightProbeUrl
+                item.imageBasedLighting = root.orbitImageBasedLighting
             }
             onStatusChanged: {
                 if (status === Loader.Error)
@@ -377,6 +380,10 @@ ApplicationWindow {
             function onOrbitGlassTransparencyChanged() {
                 if (threeDimensionalOrbit.item)
                     threeDimensionalOrbit.item.glassTransparency = root.orbitGlassTransparency
+            }
+            function onOrbitImageBasedLightingChanged() {
+                if (threeDimensionalOrbit.item)
+                    threeDimensionalOrbit.item.imageBasedLighting = root.orbitImageBasedLighting
             }
         }
         OrbitalGlassScene {
@@ -940,6 +947,13 @@ ApplicationWindow {
                 font.pixelSize: 10
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
+            }
+            CheckBox {
+                visible: root.prefer3DOrbit
+                text: "Studio reflections (experimental)"
+                checked: root.orbitImageBasedLighting
+                onToggled: root.orbitImageBasedLighting = checked
+                Accessible.name: "Toggle orbital image based lighting"
             }
             Text { text: "Accent theme"; color: "#ecfaff"; font.bold: true }
             RowLayout {
