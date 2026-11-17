@@ -257,3 +257,6 @@ After updating, compare new Ubuntu screenshots with the previous result. In Sett
 
 ### 3D glass contrast correction after Ubuntu screenshot (2026-11-17)
 The material tuning from the prior pass made the sphere **too luminous and opaque** on the user's machine. The next revision deliberately darkens the opaque 3D core to navy/violet, reduces direct/point-light intensity and pedestal emission, and adds narrow low-opacity edge highlights to suggest glass. It does not yet offer physically correct refraction, screen-space blur or environment reflections. Test with a busy photoreal wallpaper and with a simple solid background, then compare against the close-up reference. A screenshot is needed to determine whether the tuning worked.
+
+### 3D glass clarity control — 16:53 visual feedback
+The newest Ubuntu screenshot shows a darker sphere, but the opaque core still hides the scenery instead of resembling transparent glass. The **3D glass clarity** slider in Settings now adjusts transparency of both real 3D `#Sphere` model layers; the default is 78%. It is not physically accurate glass or blur and does not persist yet. Change the slider without rebuilding and compare the same wallpaper at several values. Check for depth/sorting artifacts and whether icons remain keyboard-operable. **Do not accept reference visual parity based solely on alpha blending.**
