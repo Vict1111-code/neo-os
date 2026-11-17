@@ -42,6 +42,59 @@ class DesktopSourceTests(unittest.TestCase):
         self.assertIn("matrixPty.stop()", qml)
         self.assertIn("MatrixTerminal {", root_qml)
 
+    def test_celestial_visual_contract_and_no_fake_data(self):
+        qml = (SHELL / "Main.qml").read_text()
+        cpp = (SHELL / "main.cpp").read_text()
+        for token in (
+            "Canvas {", "createRadialGradient", "source: backend.wallpaperUrl",
+            "backend.setWallpaperPath(", "backend.setAccentTheme(",
+            "backend.pinnedApps", "backend.availableApps",
+            "backend.wallpaperThemes", "backend.wallpaperDim",
+            "backend.setWallpaperDim(", "FileDialog {", "wallpaperPicker.open()",
+            "backend.importWallpaper(", "backend.refreshWallpapers()",
+            "NEO AI ASSISTANT", "SYSTEM STATUS", "NEO MARKET",
+            "DEVICES & SYNC", "Ctrl+Space", "Ctrl+K",
+            "not connected", "not implemented", "root.reducedMotion"
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, qml)
+        for token in ("QImageReader(path).canRead()", "wallpaperThemes READ wallpaperThemes",
+                      "QStandardPaths::GenericDataLocation", "appearance/dim", "appearance/wallpaper",
+                      "appearance/accent", "wallpaperUrlChanged()",
+                      "accentThemeChanged()", "wallpaperThemesChanged()",
+                      "QCryptographicHash::Sha256", "Q_INVOKABLE bool importWallpaper(",
+                      "ensureBuiltInWallpapers()", "wallpaperErrorChanged()",
+                      "image.save(destination, \"PNG\")"):
+            with self.subTest(token=token):
+                self.assertIn(token, cpp)
+
+    def test_orbital_launcher_visual_and_keyboard_contract(self):
+        qml = (SHELL / "Main.qml").read_text()
+        for token in (
+            "id: orbit", "readonly property real availableWidth",
+            "readonly property real hubDiameter", "OrbitalGlassScene {",
+            "id: dockButton", "id: orbitAppButton", "Accessible.description:",
+            "OrbitalGlassScene {", "OrbitalGlassBubble {",
+            "root.openApp(orbitApp.modelData, orbitApp.info.name)",
+            "backend.unpin(orbitApp.modelData)",
+            "enabled: !root.reducedMotion", "root.dockExpanded = !root.dockExpanded"
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, qml)
+
+    def test_orbital_glass_scene_is_separate_from_interactions(self):
+        cmake = (SHELL / "CMakeLists.txt").read_text()
+        visual = (SHELL / "OrbitalGlassScene.qml").read_text()
+        bubble = (SHELL / "OrbitalGlassBubble.qml").read_text()
+        for filename in ("OrbitalGlassScene.qml", "OrbitalGlassBubble.qml"):
+            self.assertIn(filename, cmake)
+        for effect in ("createRadialGradient", "createLinearGradient",
+                       "ellipse(ctx", "ctx.arc(", "ctx.rotate("):
+            self.assertIn(effect, visual)
+        for hook in ("property string iconUrl", "property string label",
+                     "property bool focused", "source: sphere.iconUrl"):
+            self.assertIn(hook, bubble)
+
     def test_launcher_avoids_shell_interpolation(self):
         cpp = (SHELL / "main.cpp").read_text()
         self.assertIn('QProcess::startDetached("gio", {"launch", appPaths.value(id)})', cpp)

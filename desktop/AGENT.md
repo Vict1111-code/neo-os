@@ -37,3 +37,41 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - `MatrixPty::stop()` now attempts to signal the foreground PTY process group and Bash process group before reap/force-kill of the direct child.
 - `MatrixPtySmoke.cpp` adds a live headless integration test and CTest/CI integration. It does not establish cleanup of arbitrary detached descendants.
 - Do not call this a production-quality terminal emulator. Review/test errors and manual Ubuntu behavior before merging.
+
+## Issue #9 — Reference-driven celestial refinement
+- Branch `feat/9-celestial-desktop-refinement` is **stacked on** `feat/5-matrix-pty-prototype` / PR #6. Its PR must target the same base until Matrix #6 merges; then rebase/retarget and rerun CI. Do not accidentally discard `MatrixPty`.
+- User-supplied UI references show starry planetary/fantasy celestial scenes, dark translucent glass panels, cyan/violet/pink highlights, top workspace switcher, left navigation, orbit-style launcher and status/AI/store/device cards.
+- Implement real local app controls; label unsupported AI, telemetry, universal app store, device sync and workspace isolation as preview. No fake live statistics.
+- Wallpaper setting accepts a verified readable **local** image path and stores a file URL; fallback is generated Canvas scenery, not a claim that the uploaded screenshot has been embedded as a clean wallpaper.
+- Verify 1360×820 and 1024×640, QML errors, app launching, pins, wallpaper persistence, keyboard focus, Matrix CLI and reduced motion before merge.
+
+## Issue #9 — Celestial wallpaper/gallery refinement
+- `desktop/shell/install-wallpapers.sh` copies local PNG/JPG/WebP assets from a user-supplied extracted wallpaper pack into the user's XDG data directory without sudo. **The generated image binaries are not yet committed in GitHub.**
+- `DesktopBackend` discovers readable image assets in `neo-os/wallpapers`, defaults to sorted `01-ringed-moon-citadel.webp` if installed and no saved choice, and persists selected wallpaper and dim level.
+- `Main.qml` now provides a scrollable thumbnail gallery, wallpaper contrast slider, luminous orbit-ring halo and compact dock styling.
+- Verify actual renders and settings persistence on Ubuntu. CI compile and source checks do not guarantee pixel-level reference fidelity.
+
+## Issue #9 native wallpaper picker (2026-11-17)
+- Screenshots from Ubuntu show no gallery entries because the wallpaper pack was not present in the expected XDG data directory, not because Qt/C++ cannot render image assets.
+- `QtQuick.Dialogs FileDialog` now allows choosing an image through a graphical picker, avoiding manual path entry. `DesktopBackend.importWallpaper()` validates and copies the user-selected image to an XDG wallpaper gallery and refreshes it immediately via `wallpaperThemesChanged`.
+- `refreshWallpapers()` is called on startup and when opening Settings; gallery displays an explicit empty state rather than a blank strip. Qt Quick Dialogs Ubuntu runtime module must be installed.
+- Follow through with source tests, compile CI, Ubuntu picker/selection/gallery/restart screenshots; **do not declare the UI visually equivalent to user concept art yet**. Graphic polish can proceed on Ubuntu; LFS is needed later for the independent OS session, boot and system integration.
+
+## Issue #9 — 2026-11-17 wallpaper failure regression
+- Ubuntu user verified FileDialog opens but image selection did not change background, and the local gallery was empty. Do not claim import was working.
+- C++ seeds four **procedural PNG** wallpaper presets via QPainter when absent, exposing a useful gallery without ZIP install. These are not the photoreal chat-generated assets.
+- Import now decodes with QImageReader and saves to a local PNG rather than copying source format; failures are emitted via `wallpaperError` and logged. Add `qt6-image-formats-plugins` for WebP on Ubuntu.
+- Require Ubuntu WebP import and gallery/restart validation, and verify resource limits and default-theme behavior. CI compilation does not exercise the file dialog.
+
+- CI now runs `neo-desktop --wallpaper-self-test` using a temporary XDG directory, asserting built-in gallery initialization and PNG import/selection. This is headless backend coverage, not proof the native picker works in GNOME.
+
+## Issue #9 orbit v0.4 pass — 2026-11-17
+- `Main.qml` central orbit has responsive geometry, layered circle/plinth visuals, larger hub, and focusable overlay Buttons for **each** real pinned app, plus right-click unpin. Keep functional launch/pin and Matrix integration intact.
+- Transform/position animations guard on `!root.reducedMotion`. Avoid raster mockups masquerading as interactive controls.
+- Required manual tests: reference comparison, 1360×820 and 1024×640, Tab/Enter/Space, Ctrl+Space, right-click pin persistence, colors and hover/reduced motion. GitHub source tests and Qt build alone don't prove visual or accessibility correctness.
+
+## Glass-orbit v0.5 pass
+- `OrbitalGlassScene.qml` is a dedicated 2.5D Canvas background behind the **functional** orbital app buttons; `OrbitalGlassBubble.qml` paints separate glass texture for each pinned app icon.
+- New files must be included in `qt_add_qml_module` in CMake; control semantics and app IDs must remain in `Main.qml`.
+- Do not call Canvas effects genuine 3D or real desktop blur. Shader/Quick3D renderer will be a distinct scoped feature if visual acceptance still falls short.
+- CI + Ubuntu runtime screenshot, QML console warnings, performance, keyboard, app-pinning and small-window validations are required before merge.

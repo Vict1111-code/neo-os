@@ -134,3 +134,59 @@ These results are self-reported manual tests, not independent automated PTY life
 - GitHub Actions run #43945489673 completed successfully for commit `ae7314b`, including live PTY integration smoke test, source tests, Qt build and artifact upload.
 - A targeted earlier background PID test passed. Detached descendant cleanup and full terminal emulation remain limitations.
 - **Independent PR review not yet recorded**. Keep PR #6 open pending required review; do not misrepresent generic "working fine" as full formal approval.
+
+## Issue #9 — Celestial Desktop visual refinement (stacked PR, 2026-11-16)
+- Reference: user-provided futuristic classical-fantasy NEO-OS screenshots, newest showing workspace bar, left rail, glowing planetary/castle backdrop, central orbital launcher, AI/store/device/status glass cards and bottom dock.
+- On `feat/9-celestial-desktop-refinement`, rewrote `Main.qml` with glass UI composition, center orbit, bottom pinned dock, preview-only widgets, generated celestial Canvas fallback and persistent local-image wallpaper selection.
+- C++ `DesktopBackend` now persists a verified local readable wallpaper URL and cyan/violet accent choice via QSettings.
+- Existing real installed app enumeration, icon provider, launches and pin persistence are preserved, as is experimental embedded Matrix CLI from underlying PR #6.
+- **Do not misrepresent** visual-only services (AI, app market, devices, workspaces, telemetry) as actually integrated; they are clearly labeled previews.
+- **Validation pending**: CI build/QML parsing, live Ubuntu side-by-side screenshots, wallpaper persistence, 1024×640 responsiveness, keyboard/Matrix regression and independent PR review.
+- This is a **stacked** branch/PR over unmerged PR #6. Need PR #6 merged first, then retarget this change to master and rerun CI before merge.
+
+### Issue #9 — Wallpaper asset pack & visual refinement
+- Four user-selected wallpapers have been packaged for local download as `NEO-OS_Celestial_Wallpapers_v0.3.zip`. The zip is generated in conversation files, **not stored in GitHub**; user must extract and run the checked-in installer script.
+- The new `desktop/shell/install-wallpapers.sh` installs image assets to `$XDG_DATA_HOME/neo-os/wallpapers` or `$HOME/.local/share/neo-os/wallpapers` without elevated privileges.
+- C++ scans installed local image assets; first sorted image becomes default if no valid saved wallpaper exists; saves wallpaper selection, neon accent and dim strength.
+- QML Settings now presents actual thumbnails, adjustable wallpaper dim/contrast and theme controls; orbital ring glow and bottom dock are refined.
+- **Pending:** CI verification on latest commit, user Ubuntu screenshots, image pack installation, responsive comparison and independently reviewed PR #10. PR #10 remains stacked on open Matrix PR #6.
+
+## Issue #9 — Native file chooser and gallery correction (2026-11-17)
+- User supplied Ubuntu screenshots showing a functioning native UI but **no installed wallpaper thumbnails** and requested an open-and-select image picker rather than path typing.
+- Root cause: the generated ZIP was a separate conversation artifact and had not been installed to the XDG wallpaper directory. The repository does not contain those binary images.
+- Proposed fix on `feat/9-celestial-desktop-refinement`: `QtQuick.Dialogs FileDialog` for selecting local images; C++ `importWallpaper` validates and copies the file to the private XDG wallpaper gallery; `refreshWallpapers` and `wallpaperThemesChanged` refresh thumbnails dynamically. An empty-state explanation is shown when no gallery assets exist.
+- Qt 6 QML dialog module added to CI dependencies, plus new source-regression assertions and usage instructions.
+- **Status:** source committed; current CI and Ubuntu user testing pending. Independent PR review pending. Full visual reference fidelity remains unverified.
+- Visual refinement is mostly possible on the Ubuntu preview; an independent LFS image is required for true boot, compositor, login/session and OS service integration, not for graphical styling or wallpaper selection.
+
+## Issue #9 — Second Ubuntu wallpaper failure and remediation (2026-11-17)
+- User screenshot: native Choose image button now visible, but choosing an image does not change wallpaper and gallery still has no entries.
+- Identified gaps in source: no bundled default gallery images; silent boolean failure on QImageReader checks and no clear WebP plugin dependency. These are plausible explanations; precise local failure awaits visible runtime diagnostics.
+- Implemented four procedurally generated `QPainter` PNG presets seeded in XDG user wallpaper library on first launch. They are distinct from four photoreal wallpapers the user generated earlier (those are in a separate ZIP not committed as assets).
+- Updated import to validate reader errors, bound image size and convert selected image into PNG in NEO gallery; error displayed in Appearance and logged. Added `qt6-image-formats-plugins` to GitHub Actions dependencies, and docs for Ubuntu install.
+- **Status:** source committed, CI and Ubuntu functional testing pending. Do not mark issue #9 accepted without actual image import/gallery screenshots. PR #10 still stacked on unmerged PR #6 and requires review.
+
+- New CI wallpaper backend smoke gate: `--wallpaper-self-test` generates isolated test PNG, imports it via the real C++ method, verifies first-run gallery presets and selected path. Result awaits new CI execution; this does not test the native dialog UI.
+
+## Issue #9 — Wallpaper acceptance evidence (2026-11-17 09:50)
+- User reports **"the wallpaper works now"** and supplied three Ubuntu screenshots on the feature branch.
+- One screenshot shows the full celestial *01 ringed moon citadel* wallpaper rendered behind NEO Desktop's top bar, left rail, center orbit, right cards and bottom dock, with notice `Wallpaper selected: 01 ringed moon citadel`.
+- Another screenshot shows a separately imported custom portrait wallpaper rendered behind the shell, with notice `Wallpaper imported into NEO gallery`, establishing at least one successful GUI file-picker-to-import-to-render path.
+- The third screenshot shows an Appearance gallery containing several wallpaper thumbnails (including a custom imported image), with wallpaper contrast controls and theme buttons. Thus the previous empty-gallery complaint is resolved on this host.
+- **Verified visually:** image selection/rendering, successful custom import, gallery population and manual wallpaper switch. **Not established yet:** selected wallpaper persists after full desktop restart, built-in preset visibility on a clean profile, smallest target-window responsiveness, independent review and final reference-fidelity polish.
+- Last verified GitHub CI run #44051193003 completed successfully for wallpaper C++ backend integration, Qt compile and PTY regression. PR #10 remains open and stacked on PR #6.
+- Next visual sprint should prioritize central orbit size/placement, translucent panel hierarchy, coherent neon glow, bottom dock sizing and responsive layout, without misrepresenting simulated AI/service functionality as working.
+
+## Issue #9 — Orbital launcher v0.4 visual refinement (2026-11-17)
+- User supplied a circled reference screenshot and requested primary attention to orbit hub scale, 3D-like depth, radial icon spacing, hover and keyboard focus.
+- Updated QML orbit to size to remaining central desktop width/height, larger center hub, luminous halo layers, thin spherical crossing highlight, elliptical plinth, improved icon labels and focusable launch Buttons. Right-click unpin preserved.
+- No new GPU/QtQuick3D dependency; current pass uses transparent 2D shapes and QML property animations with reduced-motion guard.
+- Source regression checks added for orbit layout and semantic launch/focus hooks.
+- **Pending:** latest CI build and Ubuntu screenshot, keyboard and compact-window regression. This is an incremental approximation of reference depth, not yet pixel-perfect and not yet peer-reviewed.
+
+## Issue #9 — Reference glass-orbit compositor (2026-11-17)
+- User supplied cropped central orb reference and new Ubuntu screenshot; current flat Qt circles are still far from requested rendered 3D glass, texture, wave curves and neon pedestal.
+- New `OrbitalGlassScene.qml` separates sphere volume/rim lighting, orbital waves and platform drawing into a Qt Canvas visual layer. New `OrbitalGlassBubble.qml` renders glossy bubbles around real pinned Linux app icon images.
+- `Main.qml` retains accessibility and app launch actions as independent Buttons over visual sprites. CMake, source tests and handoff documentation updated.
+- **Important fidelity limit**: these are 2.5D procedural effects, not a full physically-based 3D sphere, real background refractive blur, or image-identical photoreal rendering. No user runtime confirmation yet; latest CI pending.
+- PR #10 remains open and stacked on unmerged Matrix PTY PR #6.
