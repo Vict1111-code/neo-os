@@ -56,3 +56,9 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - `QtQuick.Dialogs FileDialog` now allows choosing an image through a graphical picker, avoiding manual path entry. `DesktopBackend.importWallpaper()` validates and copies the user-selected image to an XDG wallpaper gallery and refreshes it immediately via `wallpaperThemesChanged`.
 - `refreshWallpapers()` is called on startup and when opening Settings; gallery displays an explicit empty state rather than a blank strip. Qt Quick Dialogs Ubuntu runtime module must be installed.
 - Follow through with source tests, compile CI, Ubuntu picker/selection/gallery/restart screenshots; **do not declare the UI visually equivalent to user concept art yet**. Graphic polish can proceed on Ubuntu; LFS is needed later for the independent OS session, boot and system integration.
+
+## Issue #9 — 2026-11-17 wallpaper failure regression
+- Ubuntu user verified FileDialog opens but image selection did not change background, and the local gallery was empty. Do not claim import was working.
+- C++ seeds four **procedural PNG** wallpaper presets via QPainter when absent, exposing a useful gallery without ZIP install. These are not the photoreal chat-generated assets.
+- Import now decodes with QImageReader and saves to a local PNG rather than copying source format; failures are emitted via `wallpaperError` and logged. Add `qt6-image-formats-plugins` for WebP on Ubuntu.
+- Require Ubuntu WebP import and gallery/restart validation, and verify resource limits and default-theme behavior. CI compilation does not exercise the file dialog.
