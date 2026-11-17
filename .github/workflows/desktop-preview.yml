@@ -32,6 +32,13 @@ jobs:
         run: cmake -S desktop/shell -B out/neo-desktop -G Ninja -DCMAKE_BUILD_TYPE=Debug
       - name: Compile
         run: cmake --build out/neo-desktop --parallel 2
+      - name: Headless wallpaper gallery and import test
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          export XDG_DATA_HOME="$(mktemp -d)"
+          trap 'rm -rf -- "$XDG_DATA_HOME"' EXIT
+          ./out/neo-desktop/neo-desktop --wallpaper-self-test
       - name: Live PTY integration test
         run: ctest --test-dir out/neo-desktop --output-on-failure
       - name: Upload compiled preview
