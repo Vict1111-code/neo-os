@@ -39,6 +39,14 @@ jobs:
           export XDG_DATA_HOME="$(mktemp -d)"
           trap 'rm -rf -- "$XDG_DATA_HOME"' EXIT
           ./out/neo-desktop/neo-desktop --wallpaper-self-test
+      - name: Offscreen Qt/QML desktop startup smoke
+        env:
+          QT_QPA_PLATFORM: offscreen
+          QT_QUICK_BACKEND: software
+        run: |
+          export XDG_DATA_HOME="$(mktemp -d)"
+          trap 'rm -rf -- "$XDG_DATA_HOME"' EXIT
+          ./out/neo-desktop/neo-desktop --desktop-smoke-test
       - name: Live PTY integration test
         run: ctest --test-dir out/neo-desktop --output-on-failure
       - name: Upload compiled preview
