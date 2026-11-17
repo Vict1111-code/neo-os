@@ -85,3 +85,7 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 ## Issue #11 — post-GPU-screenshot material tuning
 - The screenshot confirmed actual 3D execution but dark, underlit sphere and nearly black podium. We revised `OrbitalSphere3D.qml` from dark mostly-metallic shells to opaque colored core + light transparent outer shell and layered cyan/violet illuminated podium discs. Keep fallback intact.
 - `emissiveFactor` is a material appearance property; do not claim it performs bloom or physically lights the scene. Compare actual Ubuntu renders, GPU usage, zoom/compact geometry and accessibility before accepting.
+
+## Issue #11 — 16:44 contrast correction
+- Latest user screenshot shows overly diffuse pastel sphere after emissive brightening. Preserve dark glass center and high-contrast rim: new deep navy core, reduced direct lighting/emission, weak outer shell, subtle Canvas edge glints; pedestal lights are restrained.
+- This is a material tuning pass, NOT a refraction shader or background sampling implementation. Test on the user's GPU with both scenic and portrait wallpapers. Do not trust offscreen fallback smoke as proof of 3D appearance.
