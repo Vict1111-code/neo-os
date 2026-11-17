@@ -190,3 +190,10 @@ These results are self-reported manual tests, not independent automated PTY life
 - `Main.qml` retains accessibility and app launch actions as independent Buttons over visual sprites. CMake, source tests and handoff documentation updated.
 - **Important fidelity limit**: these are 2.5D procedural effects, not a full physically-based 3D sphere, real background refractive blur, or image-identical photoreal rendering. No user runtime confirmation yet; latest CI pending.
 - PR #10 remains open and stacked on unmerged Matrix PTY PR #6.
+
+## Issue #11 — GPU 3D orb feasibility (2026-11-17)
+- New user screenshot of v0.5 shows drawn volumetric appearance and concentric trails, but still far from photoreal glass/material reference. Explicit 3D renderer spike started in `feat/11-quick3d-orbital-sphere`, based on active visual branch (PR #10).
+- `OrbitalSphere3D.qml` introduces actual `#Sphere` geometry, perspective camera, real lights, two transparent-ish PrincipledMaterials, a cylinder-geometry pedestal and 2D elliptical glow curves. The source code is real 3D but **not** an exact physically refractive glass or fully 3D light-wave model.
+- `Main.qml` selects 3D via a Loader and keeps the 2.5D fallback; toggle in Appearance. This lets the real pinned app bubble buttons, focus behavior and wallpaper survive.
+- Ubuntu 24.04 uses `qml6-module-quick3d` and `qt6-quick3d-dev`. CI updates/install and static checks are in progress; no Ubuntu GPU screenshot or performance result yet.
+- Need side-by-side review, reduce-motion/shortcut/regression testing, shader/material polish and independent PR review before merging. PR #11 is an issue, not a merged feature.
