@@ -338,89 +338,16 @@ ApplicationWindow {
         x: sideRail.x + sideRail.width +
            (root.width - (sideRail.x + sideRail.width) - rightPanels.width - width) / 2
         y: Math.max(154, Math.min(root.height - height - 93, root.height * 0.57 - height / 2))
-        readonly property real iconDiameter: Math.min(75, Math.max(49, width * 0.16))
-        readonly property real orbitRadius: root.dockExpanded ? width * 0.355 : width * 0.295
-        readonly property real hubDiameter: Math.min(122, Math.max(96, width * 0.255))
+        readonly property real iconDiameter: Math.min(81, Math.max(54, width * 0.17))
+        readonly property real orbitRadius: root.dockExpanded ? width * 0.367 : width * 0.31
+        readonly property real hubDiameter: Math.min(127, Math.max(102, width * 0.27))
 
-        // A floor-like luminous elliptical pedestal gives the sphere some depth.
-        Rectangle {
-            id: orbitPedestalHalo
+        // The high-detail glass-sphere artwork is rendered separately from app hit targets.
+        OrbitalGlassScene {
+            id: orbitalSurface
+            anchors.fill: parent
+            violet: backend.accentTheme === "violet"
             z: -1
-            x: orbit.width * 0.05
-            y: orbit.height * 0.78
-            width: orbit.width * 0.90
-            height: orbit.height * 0.20
-            radius: height / 2
-            color: "#20122f62"
-            border.color: root.neon
-            border.width: 3
-            opacity: 0.67
-        }
-        Rectangle {
-            z: -1
-            x: orbit.width * 0.16
-            y: orbit.height * 0.82
-            width: orbit.width * 0.68
-            height: orbit.height * 0.115
-            radius: height / 2
-            color: "#1938c5e9"
-            border.color: "#cc82fe"
-            border.width: 2
-            opacity: 0.62
-        }
-        Rectangle {
-            anchors.centerIn: parent
-            width: orbit.orbitRadius * 2 + 72
-            height: width
-            radius: width / 2
-            color: "#0813213c"
-            border.color: root.neon
-            border.width: 12
-            opacity: 0.10
-            Behavior on width {
-                enabled: !root.reducedMotion
-                NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
-            }
-        }
-        Rectangle {
-            anchors.centerIn: parent
-            width: orbit.orbitRadius * 2 + 34
-            height: width
-            radius: width / 2
-            color: "#15132960"
-            border.width: 3
-            border.color: root.neon
-            opacity: 0.85
-            Behavior on width {
-                enabled: !root.reducedMotion
-                NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
-            }
-        }
-        Rectangle {
-            anchors.centerIn: parent
-            width: orbit.orbitRadius * 2 - 30
-            height: width
-            radius: width / 2
-            color: "#1b1d3179"
-            border.color: "#db81ff"
-            border.width: 2
-            opacity: 0.84
-            Behavior on width {
-                enabled: !root.reducedMotion
-                NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
-            }
-        }
-        // An understated crossing highlight hints at a transparent spherical surface.
-        Rectangle {
-            anchors.centerIn: parent
-            width: orbit.orbitRadius * 2 + 20
-            height: Math.max(42, width * 0.20)
-            radius: height / 2
-            color: "transparent"
-            border.color: "#927eefff"
-            border.width: 2
-            opacity: 0.27
-            rotation: -16
         }
         Rectangle {
             id: hubAura
@@ -505,55 +432,15 @@ ApplicationWindow {
                     enabled: !root.reducedMotion
                     NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
                 }
-                Rectangle {
+                OrbitalGlassBubble {
                     anchors.fill: parent
-                    anchors.margins: -5
-                    radius: width / 2
-                    color: root.neon
-                    opacity: orbitAppButton.hovered || orbitAppButton.activeFocus ? 0.19 : 0.05
-                }
-                Rectangle {
-                    anchors.fill: parent
-                    radius: width / 2
-                    color: "#df10264d"
-                    border.width: orbitAppButton.activeFocus ? 3 : 2
-                    border.color: orbitAppButton.activeFocus ? "#ffdc91" :
-                                  orbitAppButton.hovered ? "#ffffff" : root.neon
-                    scale: orbitAppButton.pressed ? 0.95 :
-                           orbitAppButton.hovered || orbitAppButton.activeFocus ? 1.12 : 1
-                    Behavior on scale {
-                        enabled: !root.reducedMotion
-                        NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
-                    }
-                    Column {
-                        anchors.centerIn: parent
-                        spacing: 3
-                        Image {
-                            id: appOrbitIcon
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            width: Math.round(orbitApp.width * 0.47)
-                            height: width
-                            source: "image://appicons/" + orbitApp.modelData
-                            sourceSize.width: width
-                            sourceSize.height: height
-                            fillMode: Image.PreserveAspectFit
-                        }
-                        Text {
-                            visible: appOrbitIcon.status !== Image.Ready
-                            text: orbitApp.info.name ? orbitApp.info.name.slice(0, 1) : "?"
-                            color: "#e9ffff"
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.pixelSize: 16
-                        }
-                        Text {
-                            text: orbitApp.info.name || "Application"
-                            width: orbitApp.width - 8
-                            horizontalAlignment: Text.AlignHCenter
-                            elide: Text.ElideRight
-                            color: "#f6ffff"
-                            font.pixelSize: orbitApp.width >= 64 ? 10 : 9
-                        }
-                    }
+                    iconUrl: "image://appicons/" + orbitApp.modelData
+                    label: orbitApp.info.name || "App"
+                    neon: root.neon
+                    focused: orbitAppButton.activeFocus
+                    hovered: orbitAppButton.hovered
+                    pressed: orbitAppButton.pressed
+                    reducedMotion: root.reducedMotion
                 }
                 Button {
                     id: orbitAppButton
