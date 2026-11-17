@@ -68,6 +68,19 @@ class DesktopSourceTests(unittest.TestCase):
             with self.subTest(token=token):
                 self.assertIn(token, cpp)
 
+    def test_orbital_launcher_visual_and_keyboard_contract(self):
+        qml = (SHELL / "Main.qml").read_text()
+        for token in (
+            "id: orbit", "readonly property real availableWidth",
+            "readonly property real hubDiameter", "id: orbitPedestalHalo",
+            "id: dockButton", "id: orbitAppButton", "Accessible.description:",
+            "root.openApp(orbitApp.modelData, orbitApp.info.name)",
+            "backend.unpin(orbitApp.modelData)",
+            "enabled: !root.reducedMotion", "root.dockExpanded = !root.dockExpanded"
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, qml)
+
     def test_launcher_avoids_shell_interpolation(self):
         cpp = (SHELL / "main.cpp").read_text()
         self.assertIn('QProcess::startDetached("gio", {"launch", appPaths.value(id)})', cpp)
