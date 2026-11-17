@@ -187,3 +187,22 @@ sudo apt install qml6-module-qtquick-dialogs
 GitHub Actions installs this module. It adds a native Qt file picker, not system-level file-manager integration.
 
 **Safety/limitations:** the import is a user-initiated copy with a 25 MiB size bound and image-format validation, not a security sandbox. Qt Quick.Dialogs uses the platform's available native dialog integration; behavior varies with desktop session and Qt plugins. No graphics compositor or LFS is required for this functionality.
+
+## Wallpaper import failure diagnosis and bundled fallback presets (2026-11-17)
+
+Screenshots showed the native dialog but no image selection result and an empty gallery. Previous code silently returned `false` when Qt could not decode the image, notably possible for WebP on Ubuntu without a plugin. The gallery also depended entirely on the downloaded/installed ZIP, and offered no guaranteed default image choices.
+
+**Current fix:**
+- On first run, Qt uses `QPainter` to generate **four built-in procedural celestial wallpaper presets** (PNG) in the current user's XDG library, without network or binary downloads. These are simple abstract planetary backdrops; they are **not** copies of the photoreal generated concept images.
+- `Settings → Choose image from computer…` validates the selected image using Qt's image reader, converts it to a PNG in the local NEO gallery, and activates it. The gallery refreshes immediately.
+- If import fails, an error line is displayed in Appearance and the C++ log (`NEO wallpaper:`) specifies the failure reason.
+- On Ubuntu 24.04, install both Qt Quick Dialogs and additional image formats to read WebP:
+  ```bash
+  sudo apt install qml6-module-qtquick-dialogs qt6-image-formats-plugins
+  ```
+- A saved custom image takes precedence at startup. If none exists, the first built-in PNG preset is selected. Click a gallery thumbnail to switch, or Reset for procedural Canvas fallback.
+- To use the four actual photoreal images from the chat, extract the ZIP and select individual WebP images through the file picker; these are not included in GitHub's text-only source branch.
+
+**Manual acceptance after updating the branch:** confirm 4+ thumbnails even without installing the ZIP; pick each preset, restart, then choose a WebP from Downloads and confirm it becomes a `custom-*.png` gallery entry, remains visible on the background and persists on restart. If it fails, copy the visible error text or run `./out/neo-desktop/neo-desktop 2>&1 | tee neo-desktop-wallpaper.log`.
+
+**Important:** Generated presets and conversion do not prove the final reference-standard GUI; full image-pack distribution and composition refinement remain open.
