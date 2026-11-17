@@ -158,3 +158,10 @@ These results are self-reported manual tests, not independent automated PTY life
 - Qt 6 QML dialog module added to CI dependencies, plus new source-regression assertions and usage instructions.
 - **Status:** source committed; current CI and Ubuntu user testing pending. Independent PR review pending. Full visual reference fidelity remains unverified.
 - Visual refinement is mostly possible on the Ubuntu preview; an independent LFS image is required for true boot, compositor, login/session and OS service integration, not for graphical styling or wallpaper selection.
+
+## Issue #9 — Second Ubuntu wallpaper failure and remediation (2026-11-17)
+- User screenshot: native Choose image button now visible, but choosing an image does not change wallpaper and gallery still has no entries.
+- Identified gaps in source: no bundled default gallery images; silent boolean failure on QImageReader checks and no clear WebP plugin dependency. These are plausible explanations; precise local failure awaits visible runtime diagnostics.
+- Implemented four procedurally generated `QPainter` PNG presets seeded in XDG user wallpaper library on first launch. They are distinct from four photoreal wallpapers the user generated earlier (those are in a separate ZIP not committed as assets).
+- Updated import to validate reader errors, bound image size and convert selected image into PNG in NEO gallery; error displayed in Appearance and logged. Added `qt6-image-formats-plugins` to GitHub Actions dependencies, and docs for Ubuntu install.
+- **Status:** source committed, CI and Ubuntu functional testing pending. Do not mark issue #9 accepted without actual image import/gallery screenshots. PR #10 still stacked on unmerged PR #6 and requires review.
