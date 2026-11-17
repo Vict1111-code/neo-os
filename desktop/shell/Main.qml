@@ -718,9 +718,9 @@ ApplicationWindow {
         fileMode: FileDialog.OpenFile
         nameFilters: ["Wallpaper images (*.png *.jpg *.jpeg *.webp)"]
         onAccepted: {
-            root.notice = backend.importWallpaper(selectedFile.toString())
-                ? "Wallpaper imported and saved in the NEO gallery"
-                : "Could not import the selected image"
+            const success = backend.importWallpaper(selectedFile.toString())
+            root.notice = success ? "Wallpaper imported into NEO gallery"
+                                  : "Import failed: " + backend.wallpaperError
         }
     }
     Rectangle {
@@ -740,7 +740,7 @@ ApplicationWindow {
             spacing: 10
             Text { text: "⚙  APPEARANCE"; color: "#ffffff"; font.pixelSize: 20; font.bold: true }
             Text {
-                text: "Use a local wallpaper image (JPG, PNG, WebP). No files are uploaded."
+                text: "Pick a local photo, or choose from built-in celestial backgrounds. Images stay on this computer."
                 color: "#bad5ec"
                 font.pixelSize: 12
                 Layout.fillWidth: true
@@ -776,10 +776,18 @@ ApplicationWindow {
                 onToggled: root.reducedMotion = checked
                 Accessible.name: "Reduce interface animations"
             }
+            Text {
+                visible: backend.wallpaperError.length > 0
+                text: "Import details: " + backend.wallpaperError
+                color: "#ffb5ba"
+                font.pixelSize: 11
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
             Text { text: "Wallpaper gallery — installed locally"; color: "#ecfaff"; font.bold: true }
             Text {
                 visible: backend.wallpaperThemes.length === 0
-                text: "No gallery images yet. Choose an image above or install the NEO wallpaper pack."
+                text: "No wallpaper images found. Check writable data directory and application logs."
                 color: "#c0d6e8"
                 font.pixelSize: 12
                 wrapMode: Text.WordWrap
