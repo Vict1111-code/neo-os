@@ -215,3 +215,9 @@ These results are self-reported manual tests, not independent automated PTY life
 - Root technical cause: the original inner `#Sphere` has an opaque PrincipledMaterial. A translucent outer sphere and a transparent View3D cannot reveal the wallpaper through the inner fully opaque mesh. Further color/brightness tuning alone cannot fix this.
 - Branch introduces `glassTransparency` on the actual inner/outer 3D models and a live **3D glass clarity** slider in Appearance for visual comparison on the user's GPU. This is *alpha compositing*, **not refraction, HDR IBL, Fresnel or blur**. Source tests ensure the control reaches the 3D scene; pending CI and hardware confirmation.
 - Later engineering targets: proper physically shaded/custom refractive material, environment reflection/light probe, depth-aware ring geometry, designed bloom/pedestal and performance validation. Retain 2.5D fallback and accessibility.
+
+## Issue #11 — Image-based lighting v0.7 experiment (2026-11-17)
+- After repeated Ubuntu screenshots showing opaque/dark or overbright spheres, material-only tuning reached diminishing returns. The next step adds an actual image-based lighting input using a locally generated equirectangular `orbital_studio_probe_v1.png` texture and `SceneEnvironment.lightProbe`, plus an outer clearcoat.
+- C++ generates the LDR reflection environment on startup and exposes its file URL. User-facing Appearance adds Studio reflections ON/OFF for same-scene comparison. The existing clarity slider and 2.5D fallback remain.
+- Probe generation is included in headless backend testing. **This is material lighting only:** no physical refraction, live background sampling, HDR capture, ray tracing, volumetric bloom or depth-correct orbital trails.
+- Latest source committed on stacked PR #12; CI and actual Ubuntu GPU comparison remain required. Do not merge without acceptance/review; PR #12 -> PR #10 -> PR #6.
