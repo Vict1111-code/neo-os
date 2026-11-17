@@ -165,3 +165,5 @@ These results are self-reported manual tests, not independent automated PTY life
 - Implemented four procedurally generated `QPainter` PNG presets seeded in XDG user wallpaper library on first launch. They are distinct from four photoreal wallpapers the user generated earlier (those are in a separate ZIP not committed as assets).
 - Updated import to validate reader errors, bound image size and convert selected image into PNG in NEO gallery; error displayed in Appearance and logged. Added `qt6-image-formats-plugins` to GitHub Actions dependencies, and docs for Ubuntu install.
 - **Status:** source committed, CI and Ubuntu functional testing pending. Do not mark issue #9 accepted without actual image import/gallery screenshots. PR #10 still stacked on unmerged PR #6 and requires review.
+
+- New CI wallpaper backend smoke gate: `--wallpaper-self-test` generates isolated test PNG, imports it via the real C++ method, verifies first-run gallery presets and selected path. Result awaits new CI execution; this does not test the native dialog UI.
