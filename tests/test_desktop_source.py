@@ -106,10 +106,12 @@ class DesktopSourceTests(unittest.TestCase):
         self.assertIn("OrbitalSphere3D.qml", cmake)
         # The opaque inner shell and translucent outer shell must coexist;
         # fully metallic dark layers previously made the model nearly black.
-        self.assertIn('emissiveFactor: Qt.vector3d(0.035, 0.095, 0.17)', scene)
+        self.assertIn('emissiveFactor: Qt.vector3d(0.008, 0.022, 0.046)', scene)
         self.assertIn('id: podium', scene)
         self.assertGreaterEqual(scene.count('source: "#Cylinder"'), 4)
-        self.assertIn('baseColor: "#21b9ef"', scene)
+        self.assertIn('baseColor: "#164969"', scene)
+        self.assertIn('id: glassRim', scene)
+        self.assertIn('baseColor: scene.violet ? "#201239" : "#0d2141"', scene)
 
         for token in ("import QtQuick3D", "View3D {",
                       "source: \"#Sphere\"", "PerspectiveCamera {",
