@@ -64,3 +64,8 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - Require Ubuntu WebP import and gallery/restart validation, and verify resource limits and default-theme behavior. CI compilation does not exercise the file dialog.
 
 - CI now runs `neo-desktop --wallpaper-self-test` using a temporary XDG directory, asserting built-in gallery initialization and PNG import/selection. This is headless backend coverage, not proof the native picker works in GNOME.
+
+## Issue #9 orbit v0.4 pass — 2026-11-17
+- `Main.qml` central orbit has responsive geometry, layered circle/plinth visuals, larger hub, and focusable overlay Buttons for **each** real pinned app, plus right-click unpin. Keep functional launch/pin and Matrix integration intact.
+- Transform/position animations guard on `!root.reducedMotion`. Avoid raster mockups masquerading as interactive controls.
+- Required manual tests: reference comparison, 1360×820 and 1024×640, Tab/Enter/Space, Ctrl+Space, right-click pin persistence, colors and hover/reduced motion. GitHub source tests and Qt build alone don't prove visual or accessibility correctness.
