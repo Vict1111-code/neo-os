@@ -81,3 +81,7 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - `OrbitalSphere3D.qml` uses actual 3D primitives and lights, but 2D orbital trails and bubbles are still overlays. The user wants true material depth, backdrop blur/refraction and polished pedestal; these are **not** delivered yet.
 - `Main.qml` contains a Loader for the new scene plus the existing `OrbitalGlassScene` fallback. Preserve real Linux app launch actions/accessibility and make reduced-motion propagation work.
 - CI installs Ubuntu Quick 3D dependencies and runs existing software-rendering smoke with 3D intentionally disabled; a hardware-accelerated Ubuntu run is required for acceptance.
+
+## Issue #11 — post-GPU-screenshot material tuning
+- The screenshot confirmed actual 3D execution but dark, underlit sphere and nearly black podium. We revised `OrbitalSphere3D.qml` from dark mostly-metallic shells to opaque colored core + light transparent outer shell and layered cyan/violet illuminated podium discs. Keep fallback intact.
+- `emissiveFactor` is a material appearance property; do not claim it performs bloom or physically lights the scene. Compare actual Ubuntu renders, GPU usage, zoom/compact geometry and accessibility before accepting.
