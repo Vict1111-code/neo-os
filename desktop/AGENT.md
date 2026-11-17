@@ -62,3 +62,5 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 - C++ seeds four **procedural PNG** wallpaper presets via QPainter when absent, exposing a useful gallery without ZIP install. These are not the photoreal chat-generated assets.
 - Import now decodes with QImageReader and saves to a local PNG rather than copying source format; failures are emitted via `wallpaperError` and logged. Add `qt6-image-formats-plugins` for WebP on Ubuntu.
 - Require Ubuntu WebP import and gallery/restart validation, and verify resource limits and default-theme behavior. CI compilation does not exercise the file dialog.
+
+- CI now runs `neo-desktop --wallpaper-self-test` using a temporary XDG directory, asserting built-in gallery initialization and PNG import/selection. This is headless backend coverage, not proof the native picker works in GNOME.
