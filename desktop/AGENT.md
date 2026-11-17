@@ -93,3 +93,9 @@ Scope: Qt/QML shell, orbital dock, Matrix CLI, settings and accessibility (FR-02
 ## Issue #11 — alpha compositing architecture correction
 - Current dark inner sphere remains **opaque** in 16:53 Ubuntu screenshot; simply darkening a fully opaque sphere cannot reveal wallpaper behind it. Expose controlled Model.opacity through `glassTransparency` and a visible slider in Appearance; verify live on Ubuntu.
 - Clearly distinguish transparency compositing from refractive background sampling. Do not claim true optical glass. Future materials/reflection shaders must be an isolated, reviewed engineering milestone.
+
+## Issue #11 — v0.7 IBL experiment
+- `DesktopBackend.ensureOrbitalLightProbe()` creates a small deterministic equirectangular LDR PNG in `$XDG_DATA_HOME/neo-os/render` and exposes `orbitalLightProbeUrl`. The `--wallpaper-self-test` now checks this asset without external downloads.
+- `OrbitalSphere3D.qml` loads the texture through `SceneEnvironment.lightProbe` and uses clearcoat on the outer shell. `Main.qml` adds a runtime experimental IBL toggle, retaining glass clarity, real app buttons and 2.5D fallback.
+- Distinguish real environment-lighting from **true refraction**, realtime wallpaper reflection, depth-aware curved orbit geometry and bloom. Do not claim those are implemented.
+- Check hardware GPU rendering, screenshot compare probe ON/OFF with same wallpaper, GPU/CPU cost, and possible Qt 6.4 material compatibility warnings.
