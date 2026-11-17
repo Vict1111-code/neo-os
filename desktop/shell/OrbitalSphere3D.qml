@@ -7,6 +7,8 @@ Item {
     id: scene
     property bool violet: false
     property bool reducedMotion: false
+    // 0 = opaque blue volume, 1 = almost clear; adjustable without recompiling.
+    property real glassTransparency: 0.78
 
     View3D {
         anchors.fill: parent
@@ -42,6 +44,8 @@ Item {
             // flattened the entire sphere into an opaque pastel disc.
             Model {
                 source: "#Sphere"
+                // Do not force an opaque disc over the user-selected wallpaper.
+                opacity: 1.0 - scene.glassTransparency * 0.92
                 scale: Qt.vector3d(3.78, 3.78, 3.78)
                 materials: PrincipledMaterial {
                     baseColor: scene.violet ? "#201239" : "#0d2141"
@@ -53,9 +57,10 @@ Item {
             }
             Model {
                 source: "#Sphere"
+                opacity: 0.50 - scene.glassTransparency * 0.30
                 scale: Qt.vector3d(3.9, 3.9, 3.9)
                 materials: PrincipledMaterial {
-                    baseColor: scene.violet ? "#1e8b6dc8" : "#207dbce9"
+                    baseColor: scene.violet ? "#284e91c0" : "#21569bd1"
                     metalness: 0.11
                     roughness: 0.08
                     specularAmount: 1.0
